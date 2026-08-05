@@ -1,4 +1,4 @@
-import PlayerState from "../../states/PlayerState.js";
+import PlayerState from "./states/PlayerState.js";
 
 export default class PlayerController {
 

@@ -1,94 +1,130 @@
 const WeaponDatabase = {
 
-    pistol:{
+    pistol: {
 
-        name:"Pistol",
+        name: "Pistol",
 
-        damage:20,
+        damage: 18,
 
-        fireRate:250,
+        fireRate: 250,
 
-        magazine:15,
+        bulletSpeed: 900,
 
-        reload:1200,
+        recoil: 2,
 
-        automatic:false,
+        spread: 0,
 
-        bulletSpeed:900
+        magazine: 15,
 
-    },
+        reload: 1200,
 
-    smg:{
+        automatic: false,
 
-        name:"SMG",
+        bullet: "bullet_1",
 
-        damage:10,
+        effect: "effect_1_1",
 
-        fireRate:90,
-
-        magazine:40,
-
-        reload:1800,
-
-        automatic:true,
-
-        bulletSpeed:950
+        sound: "pistol"
 
     },
 
-    shotgun:{
+    smg: {
 
-        name:"Shotgun",
+        name: "SMG",
 
-        damage:14,
+        damage: 10,
 
-        pellets:8,
+        fireRate: 90,
 
-        fireRate:700,
+        magazine: 40,
 
-        magazine:8,
+        reload: 1800,
 
-        reload:2200,
+        automatic: true,
 
-        automatic:false,
-
-        bulletSpeed:800
+        bulletSpeed: 950
 
     },
 
-    rifle:{
+    shotgun: {
 
-        name:"Rifle",
+        name: "Shotgun",
 
-        damage:28,
+        damage: 14,
 
-        fireRate:170,
+        pellets: 8,
 
-        magazine:30,
+        fireRate: 700,
 
-        reload:1700,
+        magazine: 8,
 
-        automatic:true,
+        reload: 2200,
 
-        bulletSpeed:1100
+        automatic: false,
+
+        bulletSpeed: 800
 
     },
 
-    sniper:{
+    rifle: {
 
-        name:"Sniper",
+        name: "Rifle",
 
-        damage:90,
+        damage: 28,
 
-        fireRate:900,
+        fireRate: 170,
 
-        magazine:5,
+        magazine: 30,
 
-        reload:2500,
+        reload: 1700,
 
-        automatic:false,
+        automatic: true,
 
-        bulletSpeed:1600
+        bulletSpeed: 1100
+
+    },
+
+    sniper: {
+
+        name: "Sniper",
+
+        damage: 90,
+
+        fireRate: 900,
+
+        magazine: 5,
+
+        reload: 2500,
+
+        automatic: false,
+
+        bulletSpeed: 1600
+
+    },
+
+    minigun: {
+
+        damage: 8,
+
+        fireRate: 45,
+
+        bulletSpeed: 850,
+
+        recoil: 0.4,
+
+        spread: 6,
+
+        magazine: 300,
+
+        reload: 5000,
+
+        automatic: true,
+
+        bullet: "bullet_9",
+
+        effect: "effect_5_2",
+
+        sound: "minigun"
 
     }
 
