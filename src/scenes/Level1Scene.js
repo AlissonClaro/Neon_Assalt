@@ -22,6 +22,8 @@ export default class Level1Scene extends Phaser.Scene {
 
         this.ground = this.physics.add.staticGroup();
 
+        this.hud = new HUD(this);
+
         for (let i = 0; i < 50; i++) {
 
             this.ground.create(
@@ -63,6 +65,8 @@ export default class Level1Scene extends Phaser.Scene {
     update() {
 
         this.player.update();
+
+        this.hud.update(this.player);
 
         if (this.input.activePointer.isDown) {
 

@@ -1,5 +1,6 @@
+import AssetManifest from "../config/AssetManifest.js";
+
 const PLAYER_PATH = "sprites/player/";
-const WEAPON_PATH = "sprites/weapons/";
 
 const AssetManifest = {
 
@@ -37,13 +38,6 @@ const AssetManifest = {
             frameHeight: 128
         },
 
-        doubleJump: {
-            key: "player_double_jump",
-            path: PLAYER_PATH + "Double_Jump/Double_Jump.png",
-            frameWidth: 128,
-            frameHeight: 128
-        },
-
         fall: {
             key: "player_fall",
             path: PLAYER_PATH + "Falling/Falling.png",
@@ -63,27 +57,6 @@ const AssetManifest = {
             path: PLAYER_PATH + "Roll/Roll.png",
             frameWidth: 128,
             frameHeight: 128
-        },
-
-        slide: {
-            key: "player_slide",
-            path: PLAYER_PATH + "Slide_Attack/Slide_Attack.png",
-            frameWidth: 128,
-            frameHeight: 128
-        },
-
-        wallJump: {
-            key: "player_wall_jump",
-            path: PLAYER_PATH + "Wall_Jump/Wall_Jump.png",
-            frameWidth: 128,
-            frameHeight: 128
-        },
-
-        hurt: {
-            key: "player_hurt",
-            path: PLAYER_PATH + "Hurt/Hurt.png",
-            frameWidth: 128,
-            frameHeight: 128
         }
 
     },
@@ -95,100 +68,206 @@ const AssetManifest = {
     weapons: {
 
         pistol: {
-            key: "weapon_pistol",
-            idle: WEAPON_PATH + "pistol/idle.png",
-            fire: WEAPON_PATH + "pistol/fire.png",
-            bullet: "bullet_1",
-            effect: "effect_1_1"
+
+            folder: "sprites/weapons/pistol/",
+
+            models: [
+                "1","2","4","6","11","16","21",
+                "25","26","31","36","41","46"
+            ]
+
         },
 
         smg: {
-            key: "weapon_smg",
-            idle: WEAPON_PATH + "smg/idle.png",
-            fire: WEAPON_PATH + "smg/fire.png",
-            bullet: "bullet_2",
-            effect: "effect_2_1"
+
+            folder: "sprites/weapons/smg/",
+
+            models: []
+
         },
 
         shotgun: {
-            key: "weapon_shotgun",
-            idle: WEAPON_PATH + "shotgun/idle.png",
-            fire: WEAPON_PATH + "shotgun/fire.png",
-            bullet: "bullet_3",
-            effect: "effect_3_1"
+
+            folder: "sprites/weapons/shotgun/",
+
+            models: []
+
         },
 
         rifle: {
-            key: "weapon_rifle",
-            idle: WEAPON_PATH + "rifle/idle.png",
-            fire: WEAPON_PATH + "rifle/fire.png",
-            bullet: "bullet_4_1",
-            effect: "effect_2_2"
+
+            folder: "sprites/weapons/rifle/",
+
+            models: []
+
         },
 
         sniper: {
-            key: "weapon_sniper",
-            idle: WEAPON_PATH + "sniper/idle.png",
-            fire: WEAPON_PATH + "sniper/fire.png",
-            bullet: "bullet_5_1",
-            effect: "effect_4_1"
+
+            folder: "sprites/weapons/sniper/",
+
+            models: []
+
         },
 
         laser: {
-            key: "weapon_laser",
-            idle: WEAPON_PATH + "laser/idle.png",
-            fire: WEAPON_PATH + "laser/fire.png",
-            bullet: "bullet_6",
-            effect: "effect_5_1"
+
+            folder: "sprites/weapons/laser/",
+
+            models: [
+                "12"
+            ]
+
         },
 
         plasma: {
-            key: "weapon_plasma",
-            idle: WEAPON_PATH + "plasma/idle.png",
-            fire: WEAPON_PATH + "plasma/fire.png",
-            bullet: "bullet_7_1",
-            effect: "effect_5_2"
+
+            folder: "sprites/weapons/plasma/",
+
+            models: [
+                "3",
+                "7",
+                "16"
+            ]
+
         },
 
         rocket: {
-            key: "weapon_rocket",
-            idle: WEAPON_PATH + "rocket/idle.png",
-            fire: WEAPON_PATH + "rocket/fire.png",
-            bullet: "bullet_8",
-            effect: "effect_4_2"
+
+            folder: "sprites/weapons/rocket/",
+
+            models: []
+
         },
 
         minigun: {
-            key: "weapon_minigun",
-            idle: WEAPON_PATH + "minigun/idle.png",
-            fire: WEAPON_PATH + "minigun/fire.png",
-            bullet: "bullet_9",
-            effect: "effect_3_2"
+
+            folder: "sprites/weapons/minigun/",
+
+            models: [
+                "15",
+                "22",
+                "23",
+                "24",
+                "30"
+            ]
+
         },
 
         weapon1: {
-            key: "weapon_1",
-            idle: WEAPON_PATH + "Weapon_1/idle.png",
-            fire: WEAPON_PATH + "Weapon_1/fire.png",
-            bullet: "bullet_10",
-            effect: "effect_1_2"
+
+            folder: "sprites/weapons/Weapon_1/",
+
+            models: []
+
         },
 
         weapon2: {
-            key: "weapon_2",
-            idle: WEAPON_PATH + "Weapon_2/idle.png",
-            fire: WEAPON_PATH + "Weapon_2/fire.png",
-            bullet: "bullet_10",
-            effect: "effect_2_2"
+
+            folder: "sprites/weapons/Weapon_2/",
+
+            models: []
+
         },
 
         weapon3: {
-            key: "weapon_3",
-            idle: WEAPON_PATH + "Weapon_3/idle.png",
-            fire: WEAPON_PATH + "Weapon_3/fire.png",
-            bullet: "bullet_10",
-            effect: "effect_3_2"
+
+            folder: "sprites/weapons/Weapon_3/",
+
+            models: []
+
         }
+
+    },
+
+    // =====================================
+    // BULLETS
+    // =====================================
+
+    bullets: {
+
+        bullet_1: "sprites/bullets/1.png",
+        bullet_2: "sprites/bullets/2.png",
+        bullet_3: "sprites/bullets/3.png",
+        bullet_4_1: "sprites/bullets/4_1.png",
+        bullet_4_2: "sprites/bullets/4_2.png",
+        bullet_5_1: "sprites/bullets/5_1.png",
+        bullet_5_2: "sprites/bullets/5_2.png",
+        bullet_6: "sprites/bullets/6.png",
+        bullet_7_1: "sprites/bullets/7_1.png",
+        bullet_7_2: "sprites/bullets/7_2.png",
+        bullet_8: "sprites/bullets/8.png",
+        bullet_9: "sprites/bullets/9.png",
+        bullet_10: "sprites/bullets/10.png"
+
+    },
+
+    // =====================================
+    // SHOOT EFFECTS
+    // =====================================
+
+    effects: {
+
+        effect_1_1: "sprites/shoot_effects/1_1.png",
+        effect_1_2: "sprites/shoot_effects/1_2.png",
+
+        effect_2_1: "sprites/shoot_effects/2_1.png",
+        effect_2_2: "sprites/shoot_effects/2_2.png",
+
+        effect_3_1: "sprites/shoot_effects/3_1.png",
+        effect_3_2: "sprites/shoot_effects/3_2.png",
+
+        effect_4_1: "sprites/shoot_effects/4_1.png",
+        effect_4_2: "sprites/shoot_effects/4_2.png",
+
+        effect_5_1: "sprites/shoot_effects/5_1.png",
+        effect_5_2: "sprites/shoot_effects/5_2.png"
+
+    },
+
+    // =====================================
+    // MAPS
+    // =====================================
+
+    maps: {
+
+        level1: {
+
+            key: "level1",
+
+            json: "maps/level1/level1.tmj",
+
+            tilesetKey: "neon_tiles",
+
+            tileset: "maps/level1/neon_tiles.png"
+
+        }
+
+    },
+
+    // =====================================
+    // UI
+    // =====================================
+
+    ui: {
+
+        crosshair: "assets/sprites/ui/crosshair.png"
+
+    },
+
+    // =====================================
+    // AUDIO
+    // =====================================
+
+    audio: {
+
+    },
+
+    // =====================================
+    // ENEMIES
+    // =====================================
+
+    enemies: {
 
     }
 
