@@ -1,40 +1,35 @@
+import AnimationDatabase from "../config/AnimationDatabase.js";
+
 export default class AnimationFactory {
 
     static create(scene) {
 
-        const animations = [
+        Object.values(AnimationDatabase).forEach(animation => {
 
-            "idle",
-            "walk",
-            "run",
-            "jump",
-            "sit"
-
-        ];
-
-        animations.forEach(name => {
+            if (scene.anims.exists(animation.key)) {
+                return;
+            }
 
             scene.anims.create({
 
-                key: `body_${name}`,
+                key: animation.key,
 
                 frames: scene.anims.generateFrameNumbers(
 
-                    `body_${name}`,
+                    animation.sprite,
 
                     {
 
-                        start: 0,
-
-                        end: 5
+                        start: animation.start,
+                        end: animation.end
 
                     }
 
                 ),
 
-                frameRate: 10,
+                frameRate: animation.frameRate,
 
-                repeat: -1
+                repeat: animation.repeat
 
             });
 

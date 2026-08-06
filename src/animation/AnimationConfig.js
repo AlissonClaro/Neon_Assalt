@@ -1,45 +1,103 @@
-export default class AnimationFactory {
+const AnimationConfig = {
 
-    static create(scene) {
+    player_idle:{
 
-        const animations = [
+        texture:"player_idle",
 
-            "idle",
-            "walk",
-            "run",
-            "jump",
-            "sit"
+        start:0,
 
-        ];
+        end:11,
 
-        animations.forEach(name => {
+        fps:10,
 
-            scene.anims.create({
+        repeat:-1
 
-                key: `body_${name}`,
+    },
 
-                frames: scene.anims.generateFrameNumbers(
+    player_walk:{
 
-                    `body_${name}`,
+        texture:"player_walk",
 
-                    {
+        start:0,
 
-                        start: 0,
+        end:11,
 
-                        end: 5
+        fps:12,
 
-                    }
+        repeat:-1
 
-                ),
+    },
 
-                frameRate: 10,
+    player_run:{
 
-                repeat: -1
+        texture:"player_run",
 
-            });
+        start:0,
 
-        });
+        end:11,
+
+        fps:16,
+
+        repeat:-1
+
+    },
+
+    player_jump:{
+
+        texture:"player_jump",
+
+        start:0,
+
+        end:7,
+
+        fps:14,
+
+        repeat:0
+
+    },
+
+    player_fall:{
+
+        texture:"player_fall",
+
+        start:0,
+
+        end:7,
+
+        fps:12,
+
+        repeat:-1
+
+    },
+
+    player_land:{
+
+        texture:"player_land",
+
+        start:0,
+
+        end:5,
+
+        fps:12,
+
+        repeat:0
+
+    },
+
+    player_roll:{
+
+        texture:"player_roll",
+
+        start:0,
+
+        end:7,
+
+        fps:16,
+
+        repeat:0
 
     }
 
-}
+};
+
+export default AnimationConfig;

@@ -1,17 +1,115 @@
 export default {
 
-    idle: "player_idle",
+    idle: {
 
-    walk: "player_walk",
+        key: "idle",
 
-    run: "player_run",
+        sprite: "player_idle",
 
-    jump: "player_jump",
+        start: 0,
 
-    fall: "player_fall",
+        end: 9,
 
-    land: "player_land",
+        frameRate: 8,
 
-    roll: "player_roll"
+        repeat: -1
+
+    },
+
+    walk: {
+
+        key: "walk",
+
+        sprite: "player_walk",
+
+        start: 0,
+
+        end: 11,
+
+        frameRate: 12,
+
+        repeat: -1
+
+    },
+
+    run: {
+
+        key: "run",
+
+        sprite: "player_run",
+
+        start: 0,
+
+        end: 7,
+
+        frameRate: 18,
+
+        repeat: -1
+
+    },
+
+    jump: {
+
+        key: "jump",
+
+        sprite: "player_jump",
+
+        start: 0,
+
+        end: 7,
+
+        frameRate: 14,
+
+        repeat: 0
+
+    },
+
+    fall: {
+
+        key: "fall",
+
+        sprite: "player_fall",
+
+        start: 0,
+
+        end: 6,
+
+        frameRate: 12,
+
+        repeat: 0
+
+    },
+
+    land: {
+
+        key: "land",
+
+        sprite: "player_land",
+
+        start: 0,
+
+        end: 5,
+
+        frameRate: 14,
+
+        repeat: 0
+
+    },
+
+    roll: {
+
+        key: "roll",
+
+        sprite: "player_roll",
+
+        start: 0,
+
+        end: 9,
+
+        frameRate: 18,
+
+        repeat: 0
+
+    }
 
 };
