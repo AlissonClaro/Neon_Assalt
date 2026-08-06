@@ -1,4 +1,4 @@
-import AnimationDatabase from "../config/AnimationDatabase.js";
+import AnimationDatabase from "./AnimationDatabase.js";
 
 export default class AnimationFactory {
 
