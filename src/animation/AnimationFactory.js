@@ -5,11 +5,16 @@ export default class AnimationFactory {
 
     static create(scene) {
 
-        if (!scene?.anims) {
+        if (
+            !scene ||
+            !scene.anims
+        ) {
 
-            throw new Error(
-                "AnimationFactory.create: Scene inválida."
+            console.error(
+                "[AnimationFactory] Scene inválida."
             );
+
+            return;
 
         }
 
@@ -17,60 +22,98 @@ export default class AnimationFactory {
             AnimationDatabase
         ).forEach(animation => {
 
-            if (
-                scene.anims.exists(
-                    animation.key
-                )
-            ) {
+            this.createAnimation(
+                scene,
+                animation
+            );
 
-                return;
+        });
 
-            }
+    }
 
-            if (
-                !scene.textures.exists(
-                    animation.texture
-                )
-            ) {
+    static createAnimation(
+        scene,
+        animation
+    ) {
 
-                console.warn(
-                    `[AnimationFactory] Textura ausente: ${animation.texture}`
-                );
+        if (
+            !animation ||
+            !animation.key ||
+            !animation.texture
+        ) {
 
-                return;
+            console.warn(
+                "[AnimationFactory] Configuração inválida:",
+                animation
+            );
 
-            }
+            return;
 
-            const frames =
-                scene.anims
-                    .generateFrameNumbers(
+        }
 
-                        animation.texture,
+        // ==========================================
+        // ALREADY EXISTS
+        // ==========================================
 
-                        {
-                            start:
-                                animation.start,
+        if (
+            scene.anims.exists(
+                animation.key
+            )
+        ) {
 
-                            end:
-                                animation.end
-                        }
+            return;
 
-                    );
+        }
 
-            scene.anims.create({
+        // ==========================================
+        // TEXTURE
+        // ==========================================
 
-                key:
-                    animation.key,
+        if (
+            !scene.textures.exists(
+                animation.texture
+            )
+        ) {
 
-                frames,
+            console.warn(
+                `[AnimationFactory] Textura inexistente: ${animation.texture}`
+            );
 
-                frameRate:
-                    animation.frameRate,
+            return;
 
-                repeat:
-                    animation.repeat
+        }
 
-            });
+        // ==========================================
+        // CREATE
+        // ==========================================
+
+        scene.anims.create({
+
+            key:
+                animation.key,
+
+            frames:
+                scene.anims.generateFrameNumbers(
+
+                    animation.texture,
+
+                    {
+
+                        start:
+                            animation.start,
+
+                        end:
+                            animation.end
+
+                    }
+
+                ),
+
+            frameRate:
+                animation.frameRate,
+
+            repeat:
+                animation.repeat
 
         });
 

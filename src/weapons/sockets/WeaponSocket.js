@@ -6,6 +6,7 @@ export default class WeaponSocket {
     ) {
 
         this.x = x;
+
         this.y = y;
 
     }
@@ -16,6 +17,7 @@ export default class WeaponSocket {
     ) {
 
         this.x = x;
+
         this.y = y;
 
         return this;
@@ -25,10 +27,13 @@ export default class WeaponSocket {
     copy(socket) {
 
         if (!socket) {
+
             return this;
+
         }
 
         this.x = socket.x;
+
         this.y = socket.y;
 
         return this;

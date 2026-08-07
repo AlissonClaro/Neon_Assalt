@@ -1,83 +1,152 @@
 import AssetManifest
     from "../config/AssetManifest.js";
 
-import WeaponCatalog
-    from "../config/WeaponCatalog.js";
-
 export default class AssetManager {
+
+    // =====================================================
+    // LOAD ALL
+    // =====================================================
 
     static load(scene) {
 
         if (!scene) {
 
-            throw new Error(
-                "AssetManager.load: Scene inválida."
+            console.error(
+                "[AssetManager] Scene não informada."
             );
+
+            return;
 
         }
 
         this.loadPlayer(scene);
+
         this.loadWeapons(scene);
+
         this.loadBullets(scene);
+
         this.loadEffects(scene);
+
         this.loadMaps(scene);
-        this.loadAudio(scene);
-        this.loadEnemies(scene);
+
         this.loadUI(scene);
+
+        this.loadAudio(scene);
+
+        this.loadEnemies(scene);
+
+
 
     }
 
-    // =====================================
+    // =====================================================
+    // LASER BULLETS
+    // =====================================================
+
+    static loadLaserBullets(scene) {
+
+        const laserBullets =
+            AssetManifest.laserBullets ?? {};
+
+        Object.entries(
+            laserBullets
+        ).forEach(
+            ([key, path]) => {
+
+                if (
+                    !key ||
+                    !path
+                ) {
+
+                    return;
+
+                }
+
+                scene.load.image(
+                    key,
+                    path
+                );
+
+            }
+        );
+
+    }
+
+    // =====================================================
     // PLAYER
-    // =====================================
+    // =====================================================
 
     static loadPlayer(scene) {
 
-        const assets =
+        const playerAssets =
             AssetManifest.player ?? {};
 
-        Object.values(
-            assets
-        ).forEach(asset => {
+        Object.entries(
+            playerAssets
+        ).forEach(
+            ([name, asset]) => {
 
-            if (
-                !asset.key ||
-                !asset.path ||
-                !asset.frameWidth ||
-                !asset.frameHeight
-            ) {
+                if (
+                    !asset ||
+                    typeof asset !== "object"
+                ) {
 
-                console.warn(
-                    "[AssetManager] Player asset inválido:",
-                    asset
-                );
+                    console.warn(
+                        `[AssetManager] Player asset inválido: ${name}`,
+                        asset
+                    );
 
-                return;
+                    return;
 
-            }
-
-            scene.load.spritesheet(
-
-                asset.key,
-                asset.path,
-
-                {
-                    frameWidth:
-                        asset.frameWidth,
-
-                    frameHeight:
-                        asset.frameHeight
                 }
 
-            );
+                const {
+                    key,
+                    path,
+                    frameWidth,
+                    frameHeight
+                } = asset;
 
-        });
+                if (
+                    !key ||
+                    !path ||
+                    !frameWidth ||
+                    !frameHeight
+                ) {
+
+                    console.warn(
+                        `[AssetManager] Player asset incompleto: ${name}`,
+                        asset
+                    );
+
+                    return;
+
+                }
+
+                scene.load.spritesheet(
+
+                    key,
+
+                    path,
+
+                    {
+
+                        frameWidth,
+
+                        frameHeight
+
+                    }
+
+                );
+
+            }
+        );
 
     }
 
-    // =====================================
+    // =====================================================
     // WEAPONS
-    // =====================================
+    // =====================================================
 
     static loadWeapons(scene) {
 
@@ -87,20 +156,35 @@ export default class AssetManager {
         Object.entries(
             weapons
         ).forEach(
-            ([
-                weaponType,
-                weapon
-            ]) => {
+            ([weaponType, weapon]) => {
 
-                const models =
-                    WeaponCatalog[
-                        weaponType
-                    ] ?? [];
-
-                if (!weapon.folder) {
+                if (
+                    !weapon ||
+                    typeof weapon !== "object"
+                ) {
 
                     console.warn(
-                        `[AssetManager] Pasta não definida para ${weaponType}.`
+                        `[AssetManager] Configuração inválida da arma: ${weaponType}`
+                    );
+
+                    return;
+
+                }
+
+                const folder =
+                    weapon.folder;
+
+                const models =
+                    weapon.models;
+
+                if (
+                    !folder ||
+                    !Array.isArray(models)
+                ) {
+
+                    console.warn(
+                        `[AssetManager] Weapon config incompleta: ${weaponType}`,
+                        weapon
                     );
 
                     return;
@@ -110,15 +194,21 @@ export default class AssetManager {
                 models.forEach(
                     model => {
 
-                        const key =
-                            `weapon_${weaponType}_${model}`;
+                        const modelId =
+                            String(model);
+
+                        const textureKey =
+                            `weapon_${weaponType}_${modelId}`;
 
                         const path =
-                            `${weapon.folder}${model}.png`;
+                            `${folder}${modelId}.png`;
 
                         scene.load.image(
-                            key,
+
+                            textureKey,
+
                             path
+
                         );
 
                     }
@@ -129,9 +219,9 @@ export default class AssetManager {
 
     }
 
-    // =====================================
+    // =====================================================
     // BULLETS
-    // =====================================
+    // =====================================================
 
     static loadBullets(scene) {
 
@@ -143,13 +233,27 @@ export default class AssetManager {
         ).forEach(
             ([key, path]) => {
 
-                if (!path) {
+                if (
+                    !key ||
+                    !path
+                ) {
+
+                    console.warn(
+                        "[AssetManager] Bullet asset inválido:",
+                        key,
+                        path
+                    );
+
                     return;
+
                 }
 
                 scene.load.image(
+
                     key,
+
                     path
+
                 );
 
             }
@@ -157,9 +261,9 @@ export default class AssetManager {
 
     }
 
-    // =====================================
+    // =====================================================
     // EFFECTS
-    // =====================================
+    // =====================================================
 
     static loadEffects(scene) {
 
@@ -169,48 +273,17 @@ export default class AssetManager {
         Object.entries(
             effects
         ).forEach(
-            ([key, asset]) => {
-
-                if (!asset) {
-                    return;
-                }
+            ([key, path]) => {
 
                 if (
-                    typeof asset ===
-                    "string"
+                    !key ||
+                    !path
                 ) {
 
-                    scene.load.image(
+                    console.warn(
+                        "[AssetManager] Effect asset inválido:",
                         key,
-                        asset
-                    );
-
-                    return;
-
-                }
-
-                if (!asset.path) {
-                    return;
-                }
-
-                if (
-                    asset.frameWidth &&
-                    asset.frameHeight
-                ) {
-
-                    scene.load.spritesheet(
-
-                        key,
-                        asset.path,
-
-                        {
-                            frameWidth:
-                                asset.frameWidth,
-
-                            frameHeight:
-                                asset.frameHeight
-                        }
-
+                        path
                     );
 
                     return;
@@ -218,8 +291,11 @@ export default class AssetManager {
                 }
 
                 scene.load.image(
+
                     key,
-                    asset.path
+
+                    path
+
                 );
 
             }
@@ -227,135 +303,79 @@ export default class AssetManager {
 
     }
 
-    // =====================================
+    // =====================================================
     // MAPS
-    // =====================================
+    // =====================================================
 
     static loadMaps(scene) {
 
         const maps =
             AssetManifest.maps ?? {};
 
-        Object.values(
-            maps
-        ).forEach(map => {
-
-            if (
-                !map.key ||
-                !map.json
-            ) {
-
-                return;
-
-            }
-
-            scene.load.tilemapTiledJSON(
-                map.key,
-                map.json
-            );
-
-            if (
-                map.tilesetKey &&
-                map.tileset
-            ) {
-
-                scene.load.image(
-                    map.tilesetKey,
-                    map.tileset
-                );
-
-            }
-
-        });
-
-    }
-
-    // =====================================
-    // AUDIO
-    // =====================================
-
-    static loadAudio(scene) {
-
-        const audio =
-            AssetManifest.audio ?? {};
-
         Object.entries(
-            audio
+            maps
         ).forEach(
-            ([key, path]) => {
+            ([name, map]) => {
 
-                if (!path) {
+                if (
+                    !map ||
+                    typeof map !== "object"
+                ) {
+
+                    console.warn(
+                        `[AssetManager] Map inválido: ${name}`
+                    );
+
                     return;
+
                 }
 
-                scene.load.audio(
-                    key,
-                    path
-                );
+                // ==========================================
+                // TILEMAP JSON
+                // ==========================================
+
+                if (
+                    map.key &&
+                    map.json
+                ) {
+
+                    scene.load.tilemapTiledJSON(
+
+                        map.key,
+
+                        map.json
+
+                    );
+
+                }
+
+                // ==========================================
+                // TILESET
+                // ==========================================
+
+                if (
+                    map.tilesetKey &&
+                    map.tileset
+                ) {
+
+                    scene.load.image(
+
+                        map.tilesetKey,
+
+                        map.tileset
+
+                    );
+
+                }
 
             }
         );
 
     }
 
-    // =====================================
-    // ENEMIES
-    // =====================================
-
-    static loadEnemies(scene) {
-
-        const enemies =
-            AssetManifest.enemies ?? {};
-
-        Object.values(
-            enemies
-        ).forEach(enemy => {
-
-            if (
-                !enemy.key ||
-                !enemy.path
-            ) {
-
-                return;
-
-            }
-
-            if (
-                enemy.frameWidth &&
-                enemy.frameHeight
-            ) {
-
-                scene.load.spritesheet(
-
-                    enemy.key,
-                    enemy.path,
-
-                    {
-                        frameWidth:
-                            enemy.frameWidth,
-
-                        frameHeight:
-                            enemy.frameHeight
-                    }
-
-                );
-
-                return;
-
-            }
-
-            scene.load.image(
-                enemy.key,
-                enemy.path
-            );
-
-        });
-
-    }
-
-    // =====================================
+    // =====================================================
     // UI
-    // =====================================
+    // =====================================================
 
     static loadUI(scene) {
 
@@ -365,15 +385,241 @@ export default class AssetManager {
         Object.entries(
             ui
         ).forEach(
-            ([key, path]) => {
+            ([key, asset]) => {
 
-                if (!path) {
+                if (!asset) {
+
                     return;
+
                 }
 
-                scene.load.image(
+                // ==========================================
+                // STRING PATH
+                // ==========================================
+
+                if (
+                    typeof asset === "string"
+                ) {
+
+                    scene.load.image(
+
+                        key,
+
+                        asset
+
+                    );
+
+                    return;
+
+                }
+
+                // ==========================================
+                // OBJECT CONFIG
+                // ==========================================
+
+                if (
+                    typeof asset === "object" &&
+                    asset.path
+                ) {
+
+                    scene.load.image(
+
+                        asset.key ?? key,
+
+                        asset.path
+
+                    );
+
+                    return;
+
+                }
+
+                console.warn(
+                    `[AssetManager] UI asset inválido: ${key}`,
+                    asset
+                );
+
+            }
+        );
+
+    }
+
+    // =====================================================
+    // AUDIO
+    // =====================================================
+
+    static loadAudio(scene) {
+
+        const audio =
+            AssetManifest.audio ?? {};
+
+        Object.entries(
+            audio
+        ).forEach(
+            ([key, asset]) => {
+
+                if (!asset) {
+
+                    return;
+
+                }
+
+                // ==========================================
+                // STRING
+                // ==========================================
+
+                if (
+                    typeof asset === "string"
+                ) {
+
+                    scene.load.audio(
+
+                        key,
+
+                        asset
+
+                    );
+
+                    return;
+
+                }
+
+                // ==========================================
+                // ARRAY
+                // ==========================================
+
+                if (
+                    Array.isArray(asset)
+                ) {
+
+                    scene.load.audio(
+
+                        key,
+
+                        asset
+
+                    );
+
+                    return;
+
+                }
+
+                // ==========================================
+                // OBJECT
+                // ==========================================
+
+                if (
+                    typeof asset === "object" &&
+                    asset.path
+                ) {
+
+                    scene.load.audio(
+
+                        asset.key ?? key,
+
+                        asset.path
+
+                    );
+
+                    return;
+
+                }
+
+                console.warn(
+                    `[AssetManager] Audio asset inválido: ${key}`,
+                    asset
+                );
+
+            }
+        );
+
+    }
+
+    // =====================================================
+    // ENEMIES
+    // =====================================================
+
+    static loadEnemies(scene) {
+
+        const enemies =
+            AssetManifest.enemies ?? {};
+
+        Object.entries(
+            enemies
+        ).forEach(
+            ([name, enemy]) => {
+
+                if (
+                    !enemy ||
+                    typeof enemy !== "object"
+                ) {
+
+                    return;
+
+                }
+
+                const {
                     key,
+                    path,
+                    frameWidth,
+                    frameHeight
+                } = enemy;
+
+                // ==========================================
+                // SPRITESHEET
+                // ==========================================
+
+                if (
+                    key &&
+                    path &&
+                    frameWidth &&
+                    frameHeight
+                ) {
+
+                    scene.load.spritesheet(
+
+                        key,
+
+                        path,
+
+                        {
+
+                            frameWidth,
+
+                            frameHeight
+
+                        }
+
+                    );
+
+                    return;
+
+                }
+
+                // ==========================================
+                // SIMPLE IMAGE
+                // ==========================================
+
+                if (
+                    key &&
                     path
+                ) {
+
+                    scene.load.image(
+
+                        key,
+
+                        path
+
+                    );
+
+                    return;
+
+                }
+
+                console.warn(
+                    `[AssetManager] Enemy asset inválido: ${name}`,
+                    enemy
                 );
 
             }

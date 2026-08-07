@@ -1,6 +1,3 @@
-import PlayerState
-    from "./states/PlayerState.js";
-
 export default class PlayerAnimator {
 
     constructor(
@@ -11,78 +8,174 @@ export default class PlayerAnimator {
         this.player =
             player;
 
-        this.animation =
+        this.animationController =
             animationController;
+
+        this.lastState =
+            null;
 
     }
 
     update() {
 
+        if (
+            !this.player ||
+            !this.animationController
+        ) {
+
+            return;
+
+        }
+
         const state =
             this.player
                 .stateMachine
-                .current;
+                ?.getState?.() ??
+            this.player
+                .stateMachine
+                ?.currentState ??
+            "idle";
+
+        if (
+            state ===
+            this.lastState
+        ) {
+
+            return;
+
+        }
+
+        this.lastState =
+            state;
 
         switch (state) {
 
-            case PlayerState.WALK:
+            case "idle":
 
-                this.animation.play(
+                this.play(
+                    "player_idle"
+                );
+
+                break;
+
+            case "walk":
+
+                this.play(
                     "player_walk"
                 );
 
                 break;
 
-            case PlayerState.RUN:
+            case "run":
 
-                this.animation.play(
+                this.play(
                     "player_run"
                 );
 
                 break;
 
-            case PlayerState.JUMP:
+            case "jump":
 
-                this.animation.play(
+                this.play(
                     "player_jump"
                 );
 
                 break;
 
-            case PlayerState.FALL:
+            case "fall":
 
-                this.animation.play(
+                this.play(
                     "player_fall"
                 );
 
                 break;
 
-            case PlayerState.LAND:
+            case "land":
 
-                this.animation.play(
+                this.play(
                     "player_land"
                 );
 
                 break;
 
-            case PlayerState.ROLL:
+            case "roll":
 
-                this.animation.play(
+                this.play(
                     "player_roll"
                 );
 
                 break;
 
-            case PlayerState.IDLE:
             default:
 
-                this.animation.play(
+                this.play(
                     "player_idle"
                 );
 
                 break;
 
         }
+
+    }
+
+    play(
+        animationKey
+    ) {
+
+        if (
+            !this.animationController
+        ) {
+
+            return;
+
+        }
+
+        this.animationController.play(
+            animationKey,
+            true
+        );
+
+    }
+
+    force(
+        animationKey
+    ) {
+
+        if (
+            !this.animationController
+        ) {
+
+            return;
+
+        }
+
+        this.lastState =
+            null;
+
+        this.animationController.play(
+            animationKey,
+            false
+        );
+
+    }
+
+    reset() {
+
+        this.lastState =
+            null;
+
+    }
+
+    destroy() {
+
+        this.player =
+            null;
+
+        this.animationController =
+            null;
+
+        this.lastState =
+            null;
 
     }
 

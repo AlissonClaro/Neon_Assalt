@@ -14,10 +14,33 @@ export default class Bullet extends Phaser.Physics.Arcade.Image {
         scene.add.existing(this);
         scene.physics.add.existing(this);
 
+        // =====================================
+        // PHYSICS
+        // =====================================
+
         this.body.allowGravity = false;
 
+        this.body.setGravity(
+            0,
+            0
+        );
+
+        this.body.setDrag(
+            0,
+            0
+        );
+
+        // =====================================
+        // INITIAL STATE
+        // =====================================
+
         this.setActive(false);
+
         this.setVisible(false);
+
+        // =====================================
+        // DATA
+        // =====================================
 
         this.damage = 0;
 
@@ -28,24 +51,41 @@ export default class Bullet extends Phaser.Physics.Arcade.Image {
         this.spawnTime = 0;
 
         // =====================================
-        // VISUAL SIZE
+        // VISUAL
         // =====================================
 
         this.targetWidth = 22;
 
     }
 
+    // ==========================================
+    // FIRE
+    // ==========================================
+
     fire({
+
         x,
         y,
+
         angle,
+
         speed = 900,
+
         damage = 1,
+
         owner = null,
+
         texture = "bullet_default",
+
         lifeTime = 1500,
+
         targetWidth = 22
+
     }) {
+
+        // =====================================
+        // TEXTURE
+        // =====================================
 
         if (
             texture &&
@@ -60,10 +100,14 @@ export default class Bullet extends Phaser.Physics.Arcade.Image {
 
         }
 
+        // =====================================
+        // DATA
+        // =====================================
+
         this.damage =
             Math.max(
                 0,
-                damage
+                Number(damage) || 0
             );
 
         this.owner =
@@ -72,14 +116,21 @@ export default class Bullet extends Phaser.Physics.Arcade.Image {
         this.lifeTime =
             Math.max(
                 1,
-                lifeTime
+                Number(lifeTime) || 1500
             );
 
         this.spawnTime =
             this.scene.time.now;
 
         this.targetWidth =
-            targetWidth;
+            Math.max(
+                1,
+                Number(targetWidth) || 22
+            );
+
+        // =====================================
+        // ENABLE BODY
+        // =====================================
 
         this.enableBody(
             true,
@@ -93,12 +144,51 @@ export default class Bullet extends Phaser.Physics.Arcade.Image {
 
         this.setVisible(true);
 
+        // =====================================
+        // IMPORTANT:
+        // BULLETS IGNORE WORLD GRAVITY
+        // =====================================
+
+        this.body.allowGravity =
+            false;
+
+        /*
+         * Garantimos também que não existe
+         * gravidade adicional no Body.
+         */
+
+        this.body.setGravity(
+            0,
+            0
+        );
+
+        /*
+         * Sem drag.
+         *
+         * Assim a velocidade horizontal/vertical
+         * permanece constante durante o voo.
+         */
+
+        this.body.setDrag(
+            0,
+            0
+        );
+
+        this.body.setAcceleration(
+            0,
+            0
+        );
+
+        // =====================================
+        // ROTATION
+        // =====================================
+
         this.setRotation(
             angle
         );
 
         // =====================================
-        // NORMALIZE SCALE
+        // SCALE / HITBOX
         // =====================================
 
         this.normalizeScale();
@@ -107,37 +197,50 @@ export default class Bullet extends Phaser.Physics.Arcade.Image {
         // VELOCITY
         // =====================================
 
-        this.scene.physics.velocityFromRotation(
+        const velocity =
+            this.scene.physics
+                .velocityFromRotation(
 
-            angle,
+                    angle,
 
-            speed,
+                    speed
 
-            this.body.velocity
+                );
+
+        this.body.setVelocity(
+
+            velocity.x,
+
+            velocity.y
 
         );
 
     }
 
+    // ==========================================
+    // SCALE
+    // ==========================================
+
     normalizeScale() {
 
-        const width =
+        const frameWidth =
             this.frame?.realWidth ??
             0;
 
-        if (width <= 0) {
+        if (
+            frameWidth <= 0
+        ) {
 
-            this.setScale(
-                1
-            );
+            this.setScale(1);
 
             return;
 
         }
 
         const scale =
+
             this.targetWidth /
-            width;
+            frameWidth;
 
         this.setScale(
 
@@ -153,54 +256,114 @@ export default class Bullet extends Phaser.Physics.Arcade.Image {
 
         );
 
-        /*
-         * Atualiza o corpo físico para
-         * acompanhar aproximadamente
-         * o tamanho visual.
-         */
+        // =====================================
+        // HITBOX
+        // =====================================
 
-        if (this.body) {
+        if (!this.body) {
 
-            const visualWidth =
-                this.displayWidth;
-
-            const visualHeight =
-                this.displayHeight;
-
-            this.body.setSize(
-
-                Math.max(
-                    4,
-                    visualWidth * 0.8
-                ),
-
-                Math.max(
-                    3,
-                    visualHeight * 0.5
-                )
-
-            );
+            return;
 
         }
 
+        const width =
+            Math.max(
+
+                4,
+
+                this.displayWidth *
+                0.8
+
+            );
+
+        const height =
+            Math.max(
+
+                3,
+
+                this.displayHeight *
+                0.5
+
+            );
+
+        this.body.setSize(
+
+            width,
+
+            height
+
+        );
+
+        this.body.setOffset(
+
+            (
+                this.width -
+                width
+            ) / 2,
+
+            (
+                this.height -
+                height
+            ) / 2
+
+        );
+
     }
+
+    // ==========================================
+    // UPDATE
+    // ==========================================
 
     preUpdate(
         time,
         delta
     ) {
 
-        if (!this.active) {
+        if (
+            !this.active
+        ) {
 
             return;
 
         }
+
+        // =====================================
+        // FORCE NO GRAVITY
+        // =====================================
+
+        /*
+         * Proteção extra para pooling.
+         *
+         * Mesmo se algum outro sistema alterar
+         * o Body, o projétil continua sem
+         * gravidade.
+         */
+
+        if (this.body) {
+
+            this.body.allowGravity =
+                false;
+
+            this.body.gravity.set(
+                0,
+                0
+            );
+
+        }
+
+        // =====================================
+        // LIFETIME
+        // =====================================
 
         const expired =
 
             time -
             this.spawnTime >=
             this.lifeTime;
+
+        // =====================================
+        // WORLD BOUNDS
+        // =====================================
 
         const bounds =
             this.scene
@@ -240,9 +403,15 @@ export default class Bullet extends Phaser.Physics.Arcade.Image {
 
     }
 
+    // ==========================================
+    // KILL
+    // ==========================================
+
     kill() {
 
-        if (!this.active) {
+        if (
+            !this.active
+        ) {
 
             return;
 
@@ -252,12 +421,27 @@ export default class Bullet extends Phaser.Physics.Arcade.Image {
 
         this.owner = null;
 
-        if (this.body) {
+        if (
+            this.body
+        ) {
 
-            this.setVelocity(
+            this.body.setVelocity(
                 0,
                 0
             );
+
+            this.body.setAcceleration(
+                0,
+                0
+            );
+
+            this.body.setGravity(
+                0,
+                0
+            );
+
+            this.body.allowGravity =
+                false;
 
         }
 

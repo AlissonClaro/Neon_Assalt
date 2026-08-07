@@ -22,8 +22,25 @@ export default class WeaponRenderer {
         this.weaponScale =
             1;
 
-        this.currentVisual =
-            null;
+        // =====================================
+        // DEBUG
+        // =====================================
+
+        this.debugEnabled =
+            true;
+
+        this.debugGraphics =
+            scene.add.graphics();
+
+        this.debugGraphics
+            .setDepth(100)
+            .setVisible(
+                this.debugEnabled
+            );
+
+        // =====================================
+        // WEAPON SPRITE
+        // =====================================
 
         this.sprite =
             scene.add.image(
@@ -82,9 +99,6 @@ export default class WeaponRenderer {
         const visual =
             weapon.getVisual();
 
-        this.currentVisual =
-            visual;
-
         // =====================================
         // SCALE
         // =====================================
@@ -93,16 +107,49 @@ export default class WeaponRenderer {
             visual.targetWidth
         );
 
+        const frame =
+            this.sprite.frame;
+
+        if (!frame) {
+
+            this.hide();
+
+            return;
+
+        }
+
         // =====================================
-        // GRIP
+        // WEAPON GRIP
         // =====================================
+
+        const grip =
+            weapon.getGripSocket();
+
+        const originX =
+            Phaser.Math.Clamp(
+
+                grip.x /
+                frame.realWidth,
+
+                0,
+                1
+
+            );
+
+        const originY =
+            Phaser.Math.Clamp(
+
+                grip.y /
+                frame.realHeight,
+
+                0,
+                1
+
+            );
 
         this.sprite.setOrigin(
-
-            visual.grip.x,
-
-            visual.grip.y
-
+            originX,
+            originY
         );
 
         // =====================================
@@ -123,35 +170,42 @@ export default class WeaponRenderer {
                 : 1;
 
         // =====================================
-        // PLAYER HAND SOCKET
+        // FRAME SOCKET DA MÃO
         // =====================================
 
         const hand =
-            player.handSocket;
+            typeof player
+                .getWeaponHandSocket ===
+                "function"
+
+                ? player
+                    .getWeaponHandSocket()
+
+                : {
+                    x: 6,
+                    y: 25
+                };
 
         const handX =
 
             player.x +
 
-            (
-                hand?.x ?? 12
-            ) *
+            hand.x *
             direction;
 
         const handY =
 
             player.y +
 
-            (
-                hand?.y ?? -8
-            );
+            hand.y;
+
+        // =====================================
+        // WEAPON POSITION
+        // =====================================
 
         this.sprite.setPosition(
-
             handX,
-
             handY
-
         );
 
         // =====================================
@@ -172,7 +226,8 @@ export default class WeaponRenderer {
         angle +=
             Phaser.Math.DegToRad(
 
-                visual.rotationOffset
+                visual.rotationOffset ??
+                0
 
             );
 
@@ -188,12 +243,17 @@ export default class WeaponRenderer {
             facingLeft
         );
 
-        // =====================================
-        // VISIBILITY
-        // =====================================
-
         this.sprite.setVisible(
             true
+        );
+
+        // =====================================
+        // DEBUG SOCKETS
+        // =====================================
+
+        this.drawDebug(
+            handX,
+            handY
         );
 
     }
@@ -202,7 +262,9 @@ export default class WeaponRenderer {
     // TEXTURE
     // =====================================
 
-    updateTexture(weapon) {
+    updateTexture(
+        weapon
+    ) {
 
         const texture =
             WeaponSkinManager.texture(
@@ -220,9 +282,9 @@ export default class WeaponRenderer {
         }
 
         if (
-            !this.scene
-                .textures
-                .exists(texture)
+            !this.scene.textures.exists(
+                texture
+            )
         ) {
 
             console.warn(
@@ -317,47 +379,27 @@ export default class WeaponRenderer {
 
         }
 
-        const visual =
-            weapon.getVisual();
+        const grip =
+            weapon.getGripSocket();
 
-        const frame =
-            this.sprite.frame;
+        const muzzle =
+            weapon.getMuzzleSocket();
 
-        if (!frame) {
-
-            return null;
-
-        }
-
-        const displayWidth =
-
-            frame.realWidth *
-            this.weaponScale;
-
-        const displayHeight =
-
-            frame.realHeight *
-            this.weaponScale;
-
-        // =====================================
-        // MUZZLE RELATIVE TO GRIP
-        // =====================================
-
-        const localX =
+        let localX =
 
             (
-                visual.muzzle.x -
-                visual.grip.x
+                muzzle.x -
+                grip.x
             ) *
-            displayWidth;
+            this.weaponScale;
 
         let localY =
 
             (
-                visual.muzzle.y -
-                visual.grip.y
+                muzzle.y -
+                grip.y
             ) *
-            displayHeight;
+            this.weaponScale;
 
         if (
             this.sprite.flipY
@@ -380,23 +422,26 @@ export default class WeaponRenderer {
 
             this.sprite.x +
 
-            localX * cos -
+            localX *
+            cos -
 
-            localY * sin;
+            localY *
+            sin;
 
         const y =
 
             this.sprite.y +
 
-            localX * sin +
+            localX *
+            sin +
 
-            localY * cos;
+            localY *
+            cos;
 
         return {
 
             x,
             y,
-
             angle
 
         };
@@ -404,14 +449,130 @@ export default class WeaponRenderer {
     }
 
     // =====================================
-    // VISIBILITY
+    // DEBUG
+    // =====================================
+
+    drawDebug(
+        handX,
+        handY
+    ) {
+
+        if (
+            !this.debugEnabled ||
+            !this.debugGraphics
+        ) {
+
+            return;
+
+        }
+
+        this.debugGraphics.clear();
+
+        // =====================================
+        // GRIP / HAND
+        // VERDE
+        // =====================================
+
+        this.debugGraphics.fillStyle(
+            0x00ff00,
+            1
+        );
+
+        this.debugGraphics.fillCircle(
+            handX,
+            handY,
+            3
+        );
+
+        // =====================================
+        // MUZZLE
+        // VERMELHO
+        // =====================================
+
+        const muzzle =
+            this.getMuzzlePosition();
+
+        if (muzzle) {
+
+            this.debugGraphics.fillStyle(
+                0xff0000,
+                1
+            );
+
+            this.debugGraphics.fillCircle(
+                muzzle.x,
+                muzzle.y,
+                3
+            );
+
+            // Linha grip -> muzzle
+            this.debugGraphics.lineStyle(
+                1,
+                0xffff00,
+                0.8
+            );
+
+            this.debugGraphics.beginPath();
+
+            this.debugGraphics.moveTo(
+                handX,
+                handY
+            );
+
+            this.debugGraphics.lineTo(
+                muzzle.x,
+                muzzle.y
+            );
+
+            this.debugGraphics.strokePath();
+
+        }
+
+    }
+
+    // =====================================
+    // DEBUG ON/OFF
+    // =====================================
+
+    setDebug(
+        enabled
+    ) {
+
+        this.debugEnabled =
+            enabled;
+
+        if (
+            this.debugGraphics
+        ) {
+
+            this.debugGraphics
+                .setVisible(
+                    enabled
+                );
+
+            if (!enabled) {
+
+                this.debugGraphics.clear();
+
+            }
+
+        }
+
+    }
+
+    // =====================================
+    // HIDE
     // =====================================
 
     hide() {
 
-        this.sprite?.setVisible(
-            false
-        );
+        this.sprite
+            ?.setVisible(
+                false
+            );
+
+        this.debugGraphics
+            ?.clear();
 
     }
 
@@ -432,10 +593,18 @@ export default class WeaponRenderer {
 
         }
 
-        this.currentTexture =
-            null;
+        if (
+            this.debugGraphics
+        ) {
 
-        this.currentVisual =
+            this.debugGraphics.destroy();
+
+            this.debugGraphics =
+                null;
+
+        }
+
+        this.currentTexture =
             null;
 
         this.weaponManager =

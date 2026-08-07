@@ -2,80 +2,171 @@ export default class AnimationController {
 
     constructor(sprite) {
 
-        this.sprite = sprite;
+        this.sprite =
+            sprite;
+
+        this.current =
+            null;
 
     }
+
+    // =====================================================
+    // PLAY
+    // =====================================================
 
     play(
         key,
         ignoreIfPlaying = true
     ) {
 
-        if (!key) {
+        if (
+            !this.sprite ||
+            !key
+        ) {
+
             return false;
+
+        }
+
+        // ==========================================
+        // CHECK ANIMATION
+        // ==========================================
+
+        const scene =
+            this.sprite.scene;
+
+        if (
+            !scene ||
+            !scene.anims
+        ) {
+
+            return false;
+
         }
 
         if (
-            !this.sprite.scene.anims.exists(
+            !scene.anims.exists(
                 key
             )
         ) {
 
-            console.warn(
-                `[AnimationController] Animação inexistente: ${key}`
-            );
+            /*
+             * Evita centenas de warnings
+             * por segundo.
+             */
+
+            if (
+                this.current !==
+                `missing:${key}`
+            ) {
+
+                console.warn(
+                    `[AnimationController] Animação inexistente: ${key}`
+                );
+
+            }
+
+            this.current =
+                `missing:${key}`;
 
             return false;
 
         }
 
+        // ==========================================
+        // SAME ANIMATION
+        // ==========================================
+
         if (
             ignoreIfPlaying &&
             this.sprite.anims
-                .currentAnim?.key === key &&
-            this.sprite.anims.isPlaying
+                ?.currentAnim
+                ?.key === key &&
+            this.sprite.anims
+                ?.isPlaying
         ) {
+
+            this.current =
+                key;
 
             return true;
 
         }
+
+        // ==========================================
+        // PLAY
+        // ==========================================
 
         this.sprite.play(
             key,
             ignoreIfPlaying
         );
 
+        this.current =
+            key;
+
         return true;
 
     }
 
+    // =====================================================
+    // STOP
+    // =====================================================
+
     stop() {
+
+        if (
+            !this.sprite
+        ) {
+
+            return;
+
+        }
 
         this.sprite.stop();
 
+        this.current =
+            null;
+
     }
+
+    // =====================================================
+    // CURRENT
+    // =====================================================
 
     getCurrent() {
 
+        return this.current;
+
+    }
+
+    // =====================================================
+    // EXISTS
+    // =====================================================
+
+    exists(key) {
+
         return (
-            this.sprite.anims
-                .currentAnim?.key ??
-            null
+            this.sprite
+                ?.scene
+                ?.anims
+                ?.exists(key) ??
+            false
         );
 
     }
 
-    isPlaying(key) {
+    // =====================================================
+    // DESTROY
+    // =====================================================
 
-        return (
+    destroy() {
 
-            this.sprite.anims
-                .currentAnim?.key === key &&
+        this.sprite =
+            null;
 
-            this.sprite.anims
-                .isPlaying
-
-        );
+        this.current =
+            null;
 
     }
 

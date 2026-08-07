@@ -18,10 +18,15 @@ import WeaponManager from "../../weapons/WeaponManager.js";
 import WeaponRenderer from "../../weapons/WeaponRenderer.js";
 
 import RightHandSocket from "./sockets/RightHandSocket.js";
+import FrameSocketResolver from "./sockets/FrameSocketResolver.js";
 
 export default class Player extends Entity {
 
-    constructor(scene, x, y) {
+    constructor(
+        scene,
+        x,
+        y
+    ) {
 
         super(
             scene,
@@ -41,28 +46,36 @@ export default class Player extends Entity {
         // PHYSICS
         // =====================================
 
-        this.setCollideWorldBounds(true);
+        this.setCollideWorldBounds(
+            true
+        );
 
-        this.setBounce(0);
+        this.setBounce(
+            0
+        );
 
-        this.setDragX(1200);
+        this.setDragX(
+            1200
+        );
 
         this.setMaxVelocity(
             400,
             900
         );
 
-        this.setDepth(10);
+        this.setDepth(
+            10
+        );
 
         // =====================================
-        // SOCKETS
+        // FALLBACK HAND SOCKET
         // =====================================
 
         this.handSocket =
             new RightHandSocket();
 
         // =====================================
-        // COMPONENTS
+        // PLAYER COMPONENTS
         // =====================================
 
         this.stats =
@@ -76,20 +89,20 @@ export default class Player extends Entity {
         this.inventory =
             new PlayerInventory();
 
-        // IMPORTANTE:
-        // não usar this.input
-        // e agora também evitaremos this.controls
-
         this.playerControls =
             new PlayerInput(
                 this.scene
             );
 
         this.physicsController =
-            new PlayerPhysics(this);
+            new PlayerPhysics(
+                this
+            );
 
         this.movement =
-            new PlayerMovement(this);
+            new PlayerMovement(
+                this
+            );
 
         this.stateMachine =
             new PlayerStateMachine();
@@ -110,11 +123,13 @@ export default class Player extends Entity {
             );
 
         // =====================================
-        // WEAPONS
+        // WEAPON
         // =====================================
 
         this.weaponManager =
-            new WeaponManager(this);
+            new WeaponManager(
+                this
+            );
 
         this.weaponRenderer =
             new WeaponRenderer(
@@ -132,35 +147,66 @@ export default class Player extends Entity {
         // =====================================
 
         this.controller =
-            new PlayerController(this);
+            new PlayerController(
+                this
+            );
 
     }
 
+    // ==========================================
+    // FRAME SOCKET
+    // ==========================================
+
+    getWeaponHandSocket() {
+
+        return FrameSocketResolver.resolve(
+            this,
+            this.handSocket
+        );
+
+    }
+
+    // ==========================================
+    // UPDATE
+    // ==========================================
+
     update() {
 
-        if (!this.alive) {
+        if (
+            !this.alive
+        ) {
+
             return;
+
         }
 
-        if (this.controller) {
+        if (
+            this.controller
+        ) {
 
             this.controller.update();
 
         }
 
-        if (this.animator) {
+        if (
+            this.animator
+        ) {
 
             this.animator.update();
 
         }
 
-        if (this.weaponManager) {
+        if (
+            this.weaponManager
+        ) {
 
             this.weaponManager.update();
 
         }
 
-        if (this.weaponRenderer) {
+        if (
+            this.weaponRenderer
+        ) {
 
             this.weaponRenderer.update(
                 this
@@ -170,31 +216,51 @@ export default class Player extends Entity {
 
     }
 
-    destroy(fromScene) {
+    // ==========================================
+    // DESTROY
+    // ==========================================
 
-        if (this.weaponManager) {
+    destroy(
+        fromScene
+    ) {
+
+        if (
+            this.weaponManager
+        ) {
 
             this.weaponManager.destroy();
 
-            this.weaponManager = null;
+            this.weaponManager =
+                null;
 
         }
 
-        if (this.weaponRenderer) {
+        if (
+            this.weaponRenderer
+        ) {
 
             this.weaponRenderer.destroy();
 
-            this.weaponRenderer = null;
+            this.weaponRenderer =
+                null;
 
         }
 
-        this.controller = null;
+        this.controller =
+            null;
 
-        this.animator = null;
+        this.animator =
+            null;
 
-        this.playerControls = null;
+        this.playerControls =
+            null;
 
-        super.destroy(fromScene);
+        this.handSocket =
+            null;
+
+        super.destroy(
+            fromScene
+        );
 
     }
 

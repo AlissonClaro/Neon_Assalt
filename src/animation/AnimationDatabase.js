@@ -2,11 +2,10 @@ const AnimationDatabase = {
 
     idle: {
 
-        key:
-            "player_idle",
+        key: "player_idle",
 
         texture:
-            "player_walk",
+            "player_aiming2",
 
         start: 0,
         end: 0,
@@ -19,8 +18,7 @@ const AnimationDatabase = {
 
     walk: {
 
-        key:
-            "player_walk",
+        key: "player_walk",
 
         texture:
             "player_walk",
@@ -36,8 +34,7 @@ const AnimationDatabase = {
 
     run: {
 
-        key:
-            "player_run",
+        key: "player_run",
 
         texture:
             "player_run",
@@ -53,8 +50,7 @@ const AnimationDatabase = {
 
     jump: {
 
-        key:
-            "player_jump",
+        key: "player_jump",
 
         texture:
             "player_jump",
@@ -70,8 +66,7 @@ const AnimationDatabase = {
 
     fall: {
 
-        key:
-            "player_fall",
+        key: "player_fall",
 
         texture:
             "player_fall",
@@ -87,8 +82,7 @@ const AnimationDatabase = {
 
     land: {
 
-        key:
-            "player_land",
+        key: "player_land",
 
         texture:
             "player_land",
@@ -104,8 +98,7 @@ const AnimationDatabase = {
 
     roll: {
 
-        key:
-            "player_roll",
+        key: "player_roll",
 
         texture:
             "player_roll",

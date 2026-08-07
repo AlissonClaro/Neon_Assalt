@@ -1,5 +1,3 @@
-import ShootSocket from "../entities/player/sockets/ShootSocket.js";
-
 import GripSocket from "./sockets/GripSocket.js";
 import MuzzleSocket from "./sockets/MuzzleSocket.js";
 
@@ -13,13 +11,13 @@ export default class Weapon {
         if (!data) {
 
             throw new Error(
-                "Weapon: dados obrigatórios."
+                "Weapon: dados da arma são obrigatórios."
             );
 
         }
 
         // =====================================
-        // IDENTITY
+        // ID
         // =====================================
 
         this.id =
@@ -39,7 +37,7 @@ export default class Weapon {
                 : null;
 
         // =====================================
-        // DAMAGE / FIRE
+        // GAMEPLAY
         // =====================================
 
         this.damage =
@@ -51,6 +49,9 @@ export default class Weapon {
         this.bulletSpeed =
             data.bulletSpeed ?? 900;
 
+        this.automatic =
+            data.automatic ?? false;
+
         this.pellets =
             data.pellets ?? 1;
 
@@ -59,9 +60,6 @@ export default class Weapon {
 
         this.recoil =
             data.recoil ?? 0;
-
-        this.automatic =
-            data.automatic ?? false;
 
         // =====================================
         // PROJECTILE
@@ -85,19 +83,28 @@ export default class Weapon {
         // =====================================
 
         this.magazineSize =
-            data.magazine ?? 0;
+            Math.max(
+                0,
+                data.magazine ?? 0
+            );
 
         this.ammo =
             this.magazineSize;
 
         this.reserveAmmo =
-            data.reserveAmmo ?? 0;
+            Math.max(
+                0,
+                data.reserveAmmo ?? 0
+            );
 
         this.reloadTime =
-            data.reloadTime ?? 0;
+            Math.max(
+                0,
+                data.reloadTime ?? 0
+            );
 
         // =====================================
-        // VISUAL DATABASE
+        // VISUAL
         // =====================================
 
         this.defaultVisual =
@@ -107,31 +114,16 @@ export default class Weapon {
             data.skins ?? {};
 
         // =====================================
-        // WEAPON SOCKETS
+        // SOCKETS
         // =====================================
 
-        const visual =
-            this.getVisualData();
-
         this.gripSocket =
-            new GripSocket(
-                visual.grip.x,
-                visual.grip.y
-            );
+            new GripSocket();
 
         this.muzzleSocket =
-            new MuzzleSocket(
-                visual.muzzle.x,
-                visual.muzzle.y
-            );
+            new MuzzleSocket();
 
-        /*
-         * Mantemos temporariamente porque
-         * partes antigas do projeto podem
-         * ainda utilizar ShootSocket.
-         */
-        this.shootSocket =
-            new ShootSocket();
+        this.updateSockets();
 
         // =====================================
         // STATE
@@ -146,23 +138,38 @@ export default class Weapon {
     }
 
     // =====================================
-    // RAW VISUAL DATA
+    // VISUAL
     // =====================================
 
-    getVisualData() {
+    getSkinVisual() {
 
-        const skinVisual =
-            this.skin !== null
-                ? this.skinVisuals[
-                    String(this.skin)
-                ]
-                : null;
+        if (
+            this.skin === null
+        ) {
+
+            return null;
+
+        }
+
+        return (
+            this.skinVisuals[
+                String(this.skin)
+            ] ??
+            null
+        );
+
+    }
+
+    getVisual() {
+
+        const skin =
+            this.getSkinVisual();
 
         return {
 
             targetWidth:
 
-                skinVisual?.targetWidth ??
+                skin?.targetWidth ??
 
                 this.defaultVisual
                     ?.targetWidth ??
@@ -171,7 +178,7 @@ export default class Weapon {
 
             rotationOffset:
 
-                skinVisual?.rotationOffset ??
+                skin?.rotationOffset ??
 
                 this.defaultVisual
                     ?.rotationOffset ??
@@ -182,21 +189,21 @@ export default class Weapon {
 
                 x:
 
-                    skinVisual?.grip?.x ??
+                    skin?.grip?.x ??
 
                     this.defaultVisual
                         ?.grip?.x ??
 
-                    0.28,
+                    0,
 
                 y:
 
-                    skinVisual?.grip?.y ??
+                    skin?.grip?.y ??
 
                     this.defaultVisual
                         ?.grip?.y ??
 
-                    0.72
+                    0
 
             },
 
@@ -204,21 +211,21 @@ export default class Weapon {
 
                 x:
 
-                    skinVisual?.muzzle?.x ??
+                    skin?.muzzle?.x ??
 
                     this.defaultVisual
                         ?.muzzle?.x ??
 
-                    0.85,
+                    0,
 
                 y:
 
-                    skinVisual?.muzzle?.y ??
+                    skin?.muzzle?.y ??
 
                     this.defaultVisual
                         ?.muzzle?.y ??
 
-                    0.30
+                    0
 
             }
 
@@ -226,19 +233,10 @@ export default class Weapon {
 
     }
 
-    // =====================================
-    // VISUAL
-    // =====================================
-
-    getVisual() {
+    updateSockets() {
 
         const visual =
-            this.getVisualData();
-
-        /*
-         * Atualiza os sockets caso
-         * a skin da arma mude.
-         */
+            this.getVisual();
 
         this.gripSocket.set(
             visual.grip.x,
@@ -250,21 +248,21 @@ export default class Weapon {
             visual.muzzle.y
         );
 
-        return {
+    }
 
-            targetWidth:
-                visual.targetWidth,
+    getGripSocket() {
 
-            rotationOffset:
-                visual.rotationOffset,
+        this.updateSockets();
 
-            grip:
-                this.gripSocket,
+        return this.gripSocket;
 
-            muzzle:
-                this.muzzleSocket
+    }
 
-        };
+    getMuzzleSocket() {
+
+        this.updateSockets();
+
+        return this.muzzleSocket;
 
     }
 
@@ -277,6 +275,33 @@ export default class Weapon {
         return (
             this.category ===
             "melee"
+        );
+
+    }
+
+    isFirearm() {
+
+        return (
+            this.category ===
+            "firearm"
+        );
+
+    }
+
+    isEnergy() {
+
+        return (
+            this.category ===
+            "energy"
+        );
+
+    }
+
+    isExplosive() {
+
+        return (
+            this.category ===
+            "explosive"
         );
 
     }
@@ -371,18 +396,13 @@ export default class Weapon {
         }
 
         const missing =
-
             this.magazineSize -
             this.ammo;
 
         const amount =
-
             Math.min(
-
                 missing,
-
                 this.reserveAmmo
-
             );
 
         this.ammo +=
