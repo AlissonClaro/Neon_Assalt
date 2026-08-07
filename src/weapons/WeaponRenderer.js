@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 
-import WeaponSkinManager from "./WeaponSkinManager.js";
+import WeaponSkinManager
+    from "./WeaponSkinManager.js";
 
 export default class WeaponRenderer {
 
@@ -18,13 +19,11 @@ export default class WeaponRenderer {
         this.currentTexture =
             null;
 
-        /*
-            __DEFAULT é uma textura interna
-            do Phaser.
+        this.weaponScale =
+            1;
 
-            Assim podemos criar o Image antes
-            de saber qual arma está equipada.
-        */
+        this.currentVisual =
+            null;
 
         this.sprite =
             scene.add.image(
@@ -34,100 +33,164 @@ export default class WeaponRenderer {
             );
 
         this.sprite
-            .setOrigin(
-                0.15,
-                0.5
-            )
             .setDepth(11)
             .setVisible(false);
 
     }
 
+    // =====================================
+    // UPDATE
+    // =====================================
+
     update(player) {
 
-        const weapon =
-            this.weaponManager.getWeapon();
+        if (
+            !player ||
+            !this.weaponManager
+        ) {
 
-        if (!weapon) {
-
-            this.sprite.setVisible(
-                false
-            );
+            this.hide();
 
             return;
 
         }
 
-        this.updateTexture(
-            weapon
+        const weapon =
+            this.weaponManager
+                .getWeapon();
+
+        if (!weapon) {
+
+            this.hide();
+
+            return;
+
+        }
+
+        if (
+            !this.updateTexture(
+                weapon
+            )
+        ) {
+
+            this.hide();
+
+            return;
+
+        }
+
+        const visual =
+            weapon.getVisual();
+
+        this.currentVisual =
+            visual;
+
+        // =====================================
+        // SCALE
+        // =====================================
+
+        this.calculateScale(
+            visual.targetWidth
         );
 
-        const pointer =
-            this.scene.input.activePointer;
+        // =====================================
+        // GRIP
+        // =====================================
 
-        const angle =
+        this.sprite.setOrigin(
+
+            visual.grip.x,
+
+            visual.grip.y
+
+        );
+
+        // =====================================
+        // POINTER
+        // =====================================
+
+        const pointer =
+            this.scene.input
+                .activePointer;
+
+        const facingLeft =
+            pointer.worldX <
+            player.x;
+
+        const direction =
+            facingLeft
+                ? -1
+                : 1;
+
+        // =====================================
+        // PLAYER HAND SOCKET
+        // =====================================
+
+        const hand =
+            player.handSocket;
+
+        const handX =
+
+            player.x +
+
+            (
+                hand?.x ?? 12
+            ) *
+            direction;
+
+        const handY =
+
+            player.y +
+
+            (
+                hand?.y ?? -8
+            );
+
+        this.sprite.setPosition(
+
+            handX,
+
+            handY
+
+        );
+
+        // =====================================
+        // AIM
+        // =====================================
+
+        let angle =
             Phaser.Math.Angle.Between(
 
-                player.x,
-                player.y,
+                handX,
+                handY,
 
                 pointer.worldX,
                 pointer.worldY
 
             );
 
-        const hand =
-            player.handSocket;
+        angle +=
+            Phaser.Math.DegToRad(
 
-        if (!hand) {
+                visual.rotationOffset
 
-            return;
-
-        }
-
-        /*
-            Posição inicial do socket da mão.
-
-            Não rotacionamos hand.y como antes,
-            porque isso fazia a arma orbitar
-            em torno do Player.
-
-            O socket representa um offset
-            local do corpo.
-        */
-
-        const facingLeft =
-            pointer.worldX <
-            player.x;
-
-        const handX =
-            facingLeft
-                ? -Math.abs(hand.x)
-                : Math.abs(hand.x);
-
-        this.sprite.setPosition(
-
-            player.x + handX,
-
-            player.y + hand.y
-
-        );
+            );
 
         this.sprite.setRotation(
             angle
         );
 
-        /*
-            Quando a arma aponta para a
-            esquerda, espelhamos no eixo Y.
-
-            Isso mantém a arma "de cabeça
-            para cima".
-        */
+        // =====================================
+        // FLIP
+        // =====================================
 
         this.sprite.setFlipY(
             facingLeft
         );
+
+        // =====================================
+        // VISIBILITY
+        // =====================================
 
         this.sprite.setVisible(
             true
@@ -135,69 +198,118 @@ export default class WeaponRenderer {
 
     }
 
+    // =====================================
+    // TEXTURE
+    // =====================================
+
     updateTexture(weapon) {
 
         const texture =
             WeaponSkinManager.texture(
 
                 weapon.id,
+
                 weapon.skin
 
             );
 
         if (!texture) {
 
-            this.sprite.setVisible(
-                false
-            );
-
-            return;
+            return false;
 
         }
 
         if (
-            texture ===
-            this.currentTexture
-        ) {
-
-            return;
-
-        }
-
-        if (
-            !this.scene.textures.exists(
-                texture
-            )
+            !this.scene
+                .textures
+                .exists(texture)
         ) {
 
             console.warn(
-                `[WeaponRenderer] Textura não encontrada: ${texture}`
+
+                `[WeaponRenderer] Textura ausente: ${texture}`
+
             );
 
-            this.sprite.setVisible(
-                false
+            return false;
+
+        }
+
+        if (
+            texture !==
+            this.currentTexture
+        ) {
+
+            this.sprite.setTexture(
+                texture
             );
+
+            this.currentTexture =
+                texture;
+
+        }
+
+        return true;
+
+    }
+
+    // =====================================
+    // SCALE
+    // =====================================
+
+    calculateScale(
+        targetWidth
+    ) {
+
+        const frameWidth =
+            this.sprite
+                .frame
+                ?.realWidth ??
+            0;
+
+        if (
+            frameWidth <= 0
+        ) {
 
             return;
 
         }
 
-        this.sprite.setTexture(
-            texture
+        this.weaponScale =
+
+            targetWidth /
+            frameWidth;
+
+        this.weaponScale =
+            Phaser.Math.Clamp(
+
+                this.weaponScale,
+
+                0.02,
+
+                1
+
+            );
+
+        this.sprite.setScale(
+            this.weaponScale
         );
 
-        this.currentTexture =
-            texture;
-
     }
+
+    // =====================================
+    // MUZZLE
+    // =====================================
 
     getMuzzlePosition() {
 
         const weapon =
-            this.weaponManager.getWeapon();
+            this.weaponManager
+                ?.getWeapon();
 
         if (
             !weapon ||
+            !this.sprite ||
             !this.sprite.visible
         ) {
 
@@ -205,8 +317,55 @@ export default class WeaponRenderer {
 
         }
 
-        const socket =
-            weapon.shootSocket;
+        const visual =
+            weapon.getVisual();
+
+        const frame =
+            this.sprite.frame;
+
+        if (!frame) {
+
+            return null;
+
+        }
+
+        const displayWidth =
+
+            frame.realWidth *
+            this.weaponScale;
+
+        const displayHeight =
+
+            frame.realHeight *
+            this.weaponScale;
+
+        // =====================================
+        // MUZZLE RELATIVE TO GRIP
+        // =====================================
+
+        const localX =
+
+            (
+                visual.muzzle.x -
+                visual.grip.x
+            ) *
+            displayWidth;
+
+        let localY =
+
+            (
+                visual.muzzle.y -
+                visual.grip.y
+            ) *
+            displayHeight;
+
+        if (
+            this.sprite.flipY
+        ) {
+
+            localY *= -1;
+
+        }
 
         const angle =
             this.sprite.rotation;
@@ -217,33 +376,54 @@ export default class WeaponRenderer {
         const sin =
             Math.sin(angle);
 
-        const localX =
-            socket.x;
-
-        const localY =
-            socket.y;
-
         const x =
+
             this.sprite.x +
+
             localX * cos -
+
             localY * sin;
 
         const y =
+
             this.sprite.y +
+
             localX * sin +
+
             localY * cos;
 
         return {
+
             x,
             y,
+
             angle
+
         };
 
     }
 
+    // =====================================
+    // VISIBILITY
+    // =====================================
+
+    hide() {
+
+        this.sprite?.setVisible(
+            false
+        );
+
+    }
+
+    // =====================================
+    // DESTROY
+    // =====================================
+
     destroy() {
 
-        if (this.sprite) {
+        if (
+            this.sprite
+        ) {
 
             this.sprite.destroy();
 
@@ -251,6 +431,18 @@ export default class WeaponRenderer {
                 null;
 
         }
+
+        this.currentTexture =
+            null;
+
+        this.currentVisual =
+            null;
+
+        this.weaponManager =
+            null;
+
+        this.scene =
+            null;
 
     }
 

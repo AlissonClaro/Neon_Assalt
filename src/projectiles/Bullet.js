@@ -20,10 +20,18 @@ export default class Bullet extends Phaser.Physics.Arcade.Image {
         this.setVisible(false);
 
         this.damage = 0;
+
         this.owner = null;
 
         this.lifeTime = 1500;
+
         this.spawnTime = 0;
+
+        // =====================================
+        // VISUAL SIZE
+        // =====================================
+
+        this.targetWidth = 22;
 
     }
 
@@ -35,23 +43,43 @@ export default class Bullet extends Phaser.Physics.Arcade.Image {
         damage = 1,
         owner = null,
         texture = "bullet_default",
-        lifeTime = 1500
+        lifeTime = 1500,
+        targetWidth = 22
     }) {
 
         if (
             texture &&
-            this.scene.textures.exists(texture)
+            this.scene.textures.exists(
+                texture
+            )
         ) {
 
-            this.setTexture(texture);
+            this.setTexture(
+                texture
+            );
 
         }
 
-        this.damage = damage;
-        this.owner = owner;
+        this.damage =
+            Math.max(
+                0,
+                damage
+            );
 
-        this.lifeTime = lifeTime;
-        this.spawnTime = this.scene.time.now;
+        this.owner =
+            owner;
+
+        this.lifeTime =
+            Math.max(
+                1,
+                lifeTime
+            );
+
+        this.spawnTime =
+            this.scene.time.now;
+
+        this.targetWidth =
+            targetWidth;
 
         this.enableBody(
             true,
@@ -62,38 +90,144 @@ export default class Bullet extends Phaser.Physics.Arcade.Image {
         );
 
         this.setActive(true);
+
         this.setVisible(true);
 
-        this.setRotation(angle);
+        this.setRotation(
+            angle
+        );
+
+        // =====================================
+        // NORMALIZE SCALE
+        // =====================================
+
+        this.normalizeScale();
+
+        // =====================================
+        // VELOCITY
+        // =====================================
 
         this.scene.physics.velocityFromRotation(
+
             angle,
+
             speed,
+
             this.body.velocity
+
         );
 
     }
 
-    preUpdate(time, delta) {
+    normalizeScale() {
 
-        super.preUpdate(time, delta);
+        const width =
+            this.frame?.realWidth ??
+            0;
+
+        if (width <= 0) {
+
+            this.setScale(
+                1
+            );
+
+            return;
+
+        }
+
+        const scale =
+            this.targetWidth /
+            width;
+
+        this.setScale(
+
+            Phaser.Math.Clamp(
+
+                scale,
+
+                0.02,
+
+                0.3
+
+            )
+
+        );
+
+        /*
+         * Atualiza o corpo físico para
+         * acompanhar aproximadamente
+         * o tamanho visual.
+         */
+
+        if (this.body) {
+
+            const visualWidth =
+                this.displayWidth;
+
+            const visualHeight =
+                this.displayHeight;
+
+            this.body.setSize(
+
+                Math.max(
+                    4,
+                    visualWidth * 0.8
+                ),
+
+                Math.max(
+                    3,
+                    visualHeight * 0.5
+                )
+
+            );
+
+        }
+
+    }
+
+    preUpdate(
+        time,
+        delta
+    ) {
 
         if (!this.active) {
+
             return;
+
         }
 
         const expired =
-            time - this.spawnTime >=
+
+            time -
+            this.spawnTime >=
             this.lifeTime;
 
         const bounds =
-            this.scene.physics.world.bounds;
+            this.scene
+                .physics
+                .world
+                .bounds;
+
+        const margin =
+            150;
 
         const outsideWorld =
-            this.x < bounds.x - 100 ||
-            this.x > bounds.right + 100 ||
-            this.y < bounds.y - 100 ||
-            this.y > bounds.bottom + 100;
+
+            this.x <
+                bounds.x -
+                margin ||
+
+            this.x >
+                bounds.right +
+                margin ||
+
+            this.y <
+                bounds.y -
+                margin ||
+
+            this.y >
+                bounds.bottom +
+                margin;
 
         if (
             expired ||
@@ -109,13 +243,23 @@ export default class Bullet extends Phaser.Physics.Arcade.Image {
     kill() {
 
         if (!this.active) {
+
             return;
+
         }
 
         this.damage = 0;
+
         this.owner = null;
 
-        this.setVelocity(0, 0);
+        if (this.body) {
+
+            this.setVelocity(
+                0,
+                0
+            );
+
+        }
 
         this.disableBody(
             true,

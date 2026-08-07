@@ -6,8 +6,8 @@ export default class RightHandSocket
     constructor() {
 
         super(
-            18,
-            -10
+            12,
+            -8
         );
 
     }

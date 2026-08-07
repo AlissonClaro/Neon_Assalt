@@ -209,22 +209,10 @@ export default class Level1Scene
             !this.player ||
             !this.player.active
         ) {
-
             return;
-
         }
 
-        // PLAYER
-
         this.player.update();
-
-        // CAMERA
-
-        this.cameraManager.update(
-            this.player
-        );
-
-        // HUD
 
         this.hudSystem.update(
             this.player

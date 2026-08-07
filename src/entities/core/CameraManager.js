@@ -8,36 +8,44 @@ export default class CameraManager {
             scene.cameras.main;
 
         this.targetOffsetX = 0;
+
         this.currentOffsetX = 0;
 
         this.lookAheadDistance = 100;
+
         this.lookAheadLerp = 0.08;
 
     }
 
     follow(target) {
 
+        if (!target) {
+            return;
+        }
+
         this.camera.startFollow(
-
             target,
-
             true,
-
             0.08,
             0.08
-
         );
 
     }
 
     update(target) {
 
-        if (!target) {
+        if (
+            !target ||
+            !this.camera
+        ) {
             return;
         }
 
+        const facingLeft =
+            target.flipX === true;
+
         this.targetOffsetX =
-            target.flipX
+            facingLeft
                 ? -this.lookAheadDistance
                 : this.lookAheadDistance;
 
@@ -49,10 +57,8 @@ export default class CameraManager {
             this.lookAheadLerp;
 
         this.camera.setFollowOffset(
-
             this.currentOffsetX,
             0
-
         );
 
     }
@@ -63,17 +69,15 @@ export default class CameraManager {
     ) {
 
         this.camera.setBounds(
-
             0,
             0,
             width,
             height
-
         );
 
     }
 
-    setZoom(value) {
+    setZoom(value = 1) {
 
         this.camera.setZoom(
             value
@@ -81,12 +85,26 @@ export default class CameraManager {
 
     }
 
-    setLookAhead(
-        distance
-    ) {
+    setLookAhead(distance) {
 
         this.lookAheadDistance =
-            distance;
+            Math.max(
+                0,
+                distance
+            );
+
+    }
+
+    setLookAheadLerp(value) {
+
+        this.lookAheadLerp =
+            Math.max(
+                0,
+                Math.min(
+                    1,
+                    value
+                )
+            );
 
     }
 
@@ -96,17 +114,13 @@ export default class CameraManager {
     ) {
 
         this.camera.shake(
-
             duration,
             intensity
-
         );
 
     }
 
-    flash(
-        duration = 150
-    ) {
+    flash(duration = 150) {
 
         this.camera.flash(
             duration
@@ -114,9 +128,7 @@ export default class CameraManager {
 
     }
 
-    fadeIn(
-        duration = 300
-    ) {
+    fadeIn(duration = 300) {
 
         this.camera.fadeIn(
             duration
@@ -124,9 +136,7 @@ export default class CameraManager {
 
     }
 
-    fadeOut(
-        duration = 300
-    ) {
+    fadeOut(duration = 300) {
 
         this.camera.fadeOut(
             duration
@@ -143,6 +153,20 @@ export default class CameraManager {
             x,
             y
         );
+
+    }
+
+    destroy() {
+
+        if (this.camera) {
+
+            this.camera.stopFollow();
+
+        }
+
+        this.camera = null;
+
+        this.scene = null;
 
     }
 

@@ -22,7 +22,7 @@ export default class HealthBar {
 
     update(player) {
 
-        if (!player || !player.health) {
+        if (!player?.health) {
             return;
         }
 

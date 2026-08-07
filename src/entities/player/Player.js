@@ -37,9 +37,9 @@ export default class Player extends Entity {
 
     initialize() {
 
-        // ======================================
+        // =====================================
         // PHYSICS
-        // ======================================
+        // =====================================
 
         this.setCollideWorldBounds(true);
 
@@ -54,20 +54,16 @@ export default class Player extends Entity {
 
         this.setDepth(10);
 
-        // A gravidade principal já vem do Game.js.
-        // Não adicionamos mais +1000 aqui para evitar
-        // duplicar a gravidade do mundo.
-
-        // ======================================
+        // =====================================
         // SOCKETS
-        // ======================================
+        // =====================================
 
         this.handSocket =
             new RightHandSocket();
 
-        // ======================================
-        // PLAYER COMPONENTS
-        // ======================================
+        // =====================================
+        // COMPONENTS
+        // =====================================
 
         this.stats =
             new PlayerStats();
@@ -80,7 +76,11 @@ export default class Player extends Entity {
         this.inventory =
             new PlayerInventory();
 
-        this.input =
+        // IMPORTANTE:
+        // não usar this.input
+        // e agora também evitaremos this.controls
+
+        this.playerControls =
             new PlayerInput(
                 this.scene
             );
@@ -94,12 +94,14 @@ export default class Player extends Entity {
         this.stateMachine =
             new PlayerStateMachine();
 
-        // ======================================
+        // =====================================
         // ANIMATION
-        // ======================================
+        // =====================================
 
         this.animation =
-            new AnimationController(this);
+            new AnimationController(
+                this
+            );
 
         this.animator =
             new PlayerAnimator(
@@ -107,9 +109,9 @@ export default class Player extends Entity {
                 this.animation
             );
 
-        // ======================================
+        // =====================================
         // WEAPONS
-        // ======================================
+        // =====================================
 
         this.weaponManager =
             new WeaponManager(this);
@@ -125,9 +127,9 @@ export default class Player extends Entity {
             "1"
         );
 
-        // ======================================
+        // =====================================
         // CONTROLLER
-        // ======================================
+        // =====================================
 
         this.controller =
             new PlayerController(this);
@@ -140,23 +142,57 @@ export default class Player extends Entity {
             return;
         }
 
-        this.controller.update();
+        if (this.controller) {
 
-        this.animator.update();
+            this.controller.update();
 
-        this.weaponManager.update();
+        }
 
-        this.weaponRenderer.update(this);
+        if (this.animator) {
+
+            this.animator.update();
+
+        }
+
+        if (this.weaponManager) {
+
+            this.weaponManager.update();
+
+        }
+
+        if (this.weaponRenderer) {
+
+            this.weaponRenderer.update(
+                this
+            );
+
+        }
 
     }
 
     destroy(fromScene) {
 
+        if (this.weaponManager) {
+
+            this.weaponManager.destroy();
+
+            this.weaponManager = null;
+
+        }
+
         if (this.weaponRenderer) {
 
             this.weaponRenderer.destroy();
 
+            this.weaponRenderer = null;
+
         }
+
+        this.controller = null;
+
+        this.animator = null;
+
+        this.playerControls = null;
 
         super.destroy(fromScene);
 

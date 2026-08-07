@@ -1,5 +1,4 @@
-import PlayerState
-    from "./states/PlayerState.js";
+import PlayerState from "./states/PlayerState.js";
 
 export default class PlayerController {
 
@@ -8,8 +7,8 @@ export default class PlayerController {
         this.player =
             player;
 
-        this.input =
-            player.input;
+        this.playerControls =
+            player.playerControls;
 
         this.movement =
             player.movement;
@@ -33,6 +32,15 @@ export default class PlayerController {
 
     update() {
 
+        if (
+            !this.player ||
+            !this.playerControls
+        ) {
+
+            return;
+
+        }
+
         const now =
             this.player.scene.time.now;
 
@@ -40,24 +48,16 @@ export default class PlayerController {
             this.physics.isGrounded();
 
         this.handleLanding(
-
             grounded,
             now
-
         );
 
         this.handleJump(
-
             grounded,
             now
-
         );
 
-        this.handleMovement(
-
-            now
-
-        );
+        this.handleMovement();
 
         this.updateAirState(
             grounded,
@@ -76,14 +76,15 @@ export default class PlayerController {
 
     handleMovement() {
 
+        const controls =
+            this.playerControls;
+
         const speed =
-            this.input.run()
-
+            controls.run()
                 ? this.stats.runSpeed
-
                 : this.stats.walkSpeed;
 
-        if (this.input.left()) {
+        if (controls.left()) {
 
             this.movement.moveLeft(
                 speed
@@ -93,7 +94,7 @@ export default class PlayerController {
 
         }
 
-        if (this.input.right()) {
+        if (controls.right()) {
 
             this.movement.moveRight(
                 speed
@@ -103,8 +104,7 @@ export default class PlayerController {
 
         }
 
-        this.movement
-            .stopHorizontal();
+        this.movement.stopHorizontal();
 
     }
 
@@ -114,7 +114,7 @@ export default class PlayerController {
     ) {
 
         if (
-            !this.input.jump() ||
+            !this.playerControls.jump() ||
             !grounded
         ) {
 
@@ -123,16 +123,12 @@ export default class PlayerController {
         }
 
         this.movement.jump(
-
             this.stats.jumpForce
-
         );
 
         this.stateMachine.change(
-
             PlayerState.JUMP,
             now
-
         );
 
     }
@@ -159,16 +155,12 @@ export default class PlayerController {
             );
 
         if (!justLanded) {
-
             return;
-
         }
 
         this.stateMachine.change(
-
             PlayerState.LAND,
             now
-
         );
 
     }
@@ -179,9 +171,7 @@ export default class PlayerController {
     ) {
 
         if (grounded) {
-
             return;
-
         }
 
         if (
@@ -189,10 +179,8 @@ export default class PlayerController {
         ) {
 
             this.stateMachine.change(
-
                 PlayerState.FALL,
                 now
-
             );
 
             return;
@@ -201,17 +189,14 @@ export default class PlayerController {
 
         if (
             this.physics.isRising() &&
-
             !this.stateMachine.is(
                 PlayerState.JUMP
             )
         ) {
 
             this.stateMachine.change(
-
                 PlayerState.JUMP,
                 now
-
             );
 
         }
@@ -224,9 +209,7 @@ export default class PlayerController {
     ) {
 
         if (!grounded) {
-
             return;
-
         }
 
         if (
@@ -249,20 +232,17 @@ export default class PlayerController {
         }
 
         if (
-            this.input.left() ||
-            this.input.right()
+            this.playerControls.left() ||
+            this.playerControls.right()
         ) {
 
             this.stateMachine.change(
 
-                this.input.run()
-
+                this.playerControls.run()
                     ? PlayerState.RUN
-
                     : PlayerState.WALK,
 
                 now
-
             );
 
             return;
@@ -270,10 +250,8 @@ export default class PlayerController {
         }
 
         this.stateMachine.change(
-
             PlayerState.IDLE,
             now
-
         );
 
     }

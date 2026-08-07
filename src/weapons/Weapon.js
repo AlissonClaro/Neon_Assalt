@@ -1,27 +1,45 @@
 import ShootSocket from "../entities/player/sockets/ShootSocket.js";
 
+import GripSocket from "./sockets/GripSocket.js";
+import MuzzleSocket from "./sockets/MuzzleSocket.js";
+
 export default class Weapon {
 
-    constructor(data, skin = null) {
+    constructor(
+        data,
+        skin = null
+    ) {
 
         if (!data) {
 
             throw new Error(
-                "Weapon: dados da arma são obrigatórios."
+                "Weapon: dados obrigatórios."
             );
 
         }
 
-        this.id = data.id;
+        // =====================================
+        // IDENTITY
+        // =====================================
+
+        this.id =
+            data.id;
 
         this.name =
-            data.name ?? data.id;
+            data.name ??
+            data.id;
 
         this.category =
-            data.category ?? "firearm";
+            data.category ??
+            "firearm";
+
+        this.skin =
+            skin !== null
+                ? String(skin)
+                : null;
 
         // =====================================
-        // DAMAGE
+        // DAMAGE / FIRE
         // =====================================
 
         this.damage =
@@ -45,8 +63,22 @@ export default class Weapon {
         this.automatic =
             data.automatic ?? false;
 
+        // =====================================
+        // PROJECTILE
+        // =====================================
+
         this.bullet =
-            data.bullet ?? null;
+            data.bullet ??
+            null;
+
+        this.bulletVisual = {
+
+            targetWidth:
+                data.bulletVisual
+                    ?.targetWidth ??
+                22
+
+        };
 
         // =====================================
         // AMMO
@@ -65,11 +97,45 @@ export default class Weapon {
             data.reloadTime ?? 0;
 
         // =====================================
-        // STATE
+        // VISUAL DATABASE
         // =====================================
 
-        this.skin =
-            skin;
+        this.defaultVisual =
+            data.visual ?? {};
+
+        this.skinVisuals =
+            data.skins ?? {};
+
+        // =====================================
+        // WEAPON SOCKETS
+        // =====================================
+
+        const visual =
+            this.getVisualData();
+
+        this.gripSocket =
+            new GripSocket(
+                visual.grip.x,
+                visual.grip.y
+            );
+
+        this.muzzleSocket =
+            new MuzzleSocket(
+                visual.muzzle.x,
+                visual.muzzle.y
+            );
+
+        /*
+         * Mantemos temporariamente porque
+         * partes antigas do projeto podem
+         * ainda utilizar ShootSocket.
+         */
+        this.shootSocket =
+            new ShootSocket();
+
+        // =====================================
+        // STATE
+        // =====================================
 
         this.reloading =
             false;
@@ -77,19 +143,140 @@ export default class Weapon {
         this.lastShotTime =
             -Infinity;
 
-        // =====================================
-        // SOCKET
-        // =====================================
+    }
 
-        this.shootSocket =
-            new ShootSocket();
+    // =====================================
+    // RAW VISUAL DATA
+    // =====================================
+
+    getVisualData() {
+
+        const skinVisual =
+            this.skin !== null
+                ? this.skinVisuals[
+                    String(this.skin)
+                ]
+                : null;
+
+        return {
+
+            targetWidth:
+
+                skinVisual?.targetWidth ??
+
+                this.defaultVisual
+                    ?.targetWidth ??
+
+                42,
+
+            rotationOffset:
+
+                skinVisual?.rotationOffset ??
+
+                this.defaultVisual
+                    ?.rotationOffset ??
+
+                0,
+
+            grip: {
+
+                x:
+
+                    skinVisual?.grip?.x ??
+
+                    this.defaultVisual
+                        ?.grip?.x ??
+
+                    0.28,
+
+                y:
+
+                    skinVisual?.grip?.y ??
+
+                    this.defaultVisual
+                        ?.grip?.y ??
+
+                    0.72
+
+            },
+
+            muzzle: {
+
+                x:
+
+                    skinVisual?.muzzle?.x ??
+
+                    this.defaultVisual
+                        ?.muzzle?.x ??
+
+                    0.85,
+
+                y:
+
+                    skinVisual?.muzzle?.y ??
+
+                    this.defaultVisual
+                        ?.muzzle?.y ??
+
+                    0.30
+
+            }
+
+        };
 
     }
+
+    // =====================================
+    // VISUAL
+    // =====================================
+
+    getVisual() {
+
+        const visual =
+            this.getVisualData();
+
+        /*
+         * Atualiza os sockets caso
+         * a skin da arma mude.
+         */
+
+        this.gripSocket.set(
+            visual.grip.x,
+            visual.grip.y
+        );
+
+        this.muzzleSocket.set(
+            visual.muzzle.x,
+            visual.muzzle.y
+        );
+
+        return {
+
+            targetWidth:
+                visual.targetWidth,
+
+            rotationOffset:
+                visual.rotationOffset,
+
+            grip:
+                this.gripSocket,
+
+            muzzle:
+                this.muzzleSocket
+
+        };
+
+    }
+
+    // =====================================
+    // TYPE
+    // =====================================
 
     isMelee() {
 
         return (
-            this.category === "melee"
+            this.category ===
+            "melee"
         );
 
     }
@@ -102,9 +289,15 @@ export default class Weapon {
 
     }
 
+    // =====================================
+    // SHOOT
+    // =====================================
+
     canShoot(time) {
 
-        if (this.reloading) {
+        if (
+            this.reloading
+        ) {
 
             return false;
 
@@ -120,58 +313,83 @@ export default class Weapon {
         }
 
         return (
-            time - this.lastShotTime >=
+
+            time -
+            this.lastShotTime >=
             this.fireRate
+
         );
 
     }
 
     registerShot(time) {
 
-        this.lastShotTime = time;
+        this.lastShotTime =
+            time;
 
-        if (this.usesAmmo()) {
+        if (
+            this.usesAmmo()
+        ) {
 
-            this.ammo = Math.max(
-                0,
-                this.ammo - 1
-            );
+            this.ammo =
+                Math.max(
+                    0,
+                    this.ammo - 1
+                );
 
         }
 
     }
 
+    // =====================================
+    // RELOAD
+    // =====================================
+
     needsReload() {
 
         return (
+
             this.usesAmmo() &&
-            this.ammo < this.magazineSize &&
+
+            this.ammo <
+                this.magazineSize &&
+
             this.reserveAmmo > 0
+
         );
 
     }
 
     reload() {
 
-        if (!this.needsReload()) {
+        if (
+            !this.needsReload()
+        ) {
 
             return false;
 
         }
 
         const missing =
+
             this.magazineSize -
             this.ammo;
 
         const amount =
+
             Math.min(
+
                 missing,
+
                 this.reserveAmmo
+
             );
 
-        this.ammo += amount;
+        this.ammo +=
+            amount;
 
-        this.reserveAmmo -= amount;
+        this.reserveAmmo -=
+            amount;
 
         return true;
 

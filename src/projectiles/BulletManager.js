@@ -57,7 +57,9 @@ export default class BulletManager {
 
         }
 
-        if (weapon.isMelee()) {
+        if (
+            weapon.isMelee()
+        ) {
 
             return [];
 
@@ -67,8 +69,11 @@ export default class BulletManager {
 
         const pellets =
             Math.max(
+
                 1,
+
                 weapon.pellets ?? 1
+
             );
 
         const spread =
@@ -82,15 +87,21 @@ export default class BulletManager {
 
             const angle =
                 this.applySpread(
+
                     muzzle.angle,
+
                     spread
+
                 );
 
             const bullet =
                 this.fire({
 
-                    x: muzzle.x,
-                    y: muzzle.y,
+                    x:
+                        muzzle.x,
+
+                    y:
+                        muzzle.y,
 
                     angle,
 
@@ -104,8 +115,16 @@ export default class BulletManager {
                         player,
 
                     texture:
+
                         weapon.bullet ??
-                        "bullet_default"
+                        "bullet_default",
+
+                    targetWidth:
+
+                        weapon
+                            .bulletVisual
+                            ?.targetWidth ??
+                        22
 
                 });
 

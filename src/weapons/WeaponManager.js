@@ -5,14 +5,20 @@ export default class WeaponManager {
 
     constructor(player) {
 
-        this.player = player;
+        this.player =
+            player;
 
-        this.scene = player.scene;
+        this.scene =
+            player.scene;
+
+        this.playerControls =
+            player.playerControls;
 
         this.inventory =
             new WeaponInventory();
 
-        this.weapon = null;
+        this.weapon =
+            null;
 
         this.triggerWasDown =
             false;
@@ -24,8 +30,13 @@ export default class WeaponManager {
 
     update() {
 
-        if (!this.weapon) {
+        if (
+            !this.player ||
+            !this.weapon
+        ) {
+
             return;
+
         }
 
         this.handleWeaponSwitch();
@@ -35,6 +46,10 @@ export default class WeaponManager {
         this.handleFireInput();
 
     }
+
+    // =====================================
+    // INVENTORY
+    // =====================================
 
     add(
         type,
@@ -48,7 +63,9 @@ export default class WeaponManager {
             );
 
         if (!weapon) {
+
             return null;
+
         }
 
         const added =
@@ -76,7 +93,9 @@ export default class WeaponManager {
     ) {
 
         let weapon =
-            this.inventory.get(type);
+            this.inventory.get(
+                type
+            );
 
         if (!weapon) {
 
@@ -98,11 +117,11 @@ export default class WeaponManager {
 
         }
 
+        this.cancelReload();
+
         this.inventory.select(
             type
         );
-
-        this.cancelReload();
 
         this.weapon =
             weapon;
@@ -116,14 +135,16 @@ export default class WeaponManager {
         const weapon =
             this.inventory.next();
 
-        if (weapon) {
+        if (!weapon) {
 
-            this.cancelReload();
-
-            this.weapon =
-                weapon;
+            return null;
 
         }
+
+        this.cancelReload();
+
+        this.weapon =
+            weapon;
 
         return weapon;
 
@@ -134,14 +155,16 @@ export default class WeaponManager {
         const weapon =
             this.inventory.previous();
 
-        if (weapon) {
+        if (!weapon) {
 
-            this.cancelReload();
-
-            this.weapon =
-                weapon;
+            return null;
 
         }
+
+        this.cancelReload();
+
+        this.weapon =
+            weapon;
 
         return weapon;
 
@@ -153,10 +176,48 @@ export default class WeaponManager {
 
     }
 
-    handleWeaponSwitch() {
+    // =====================================
+    // INPUT
+    // =====================================
+
+    getControls() {
+
+        /*
+         * Rebusca a referência no Player.
+         *
+         * Isso também protege contra
+         * mudanças durante inicialização.
+         */
 
         if (
-            this.player.input.weaponNext()
+            !this.playerControls &&
+            this.player
+        ) {
+
+            this.playerControls =
+                this.player.playerControls;
+
+        }
+
+        return this.playerControls;
+
+    }
+
+    handleWeaponSwitch() {
+
+        const controls =
+            this.getControls();
+
+        if (!controls) {
+
+            return;
+
+        }
+
+        if (
+            typeof controls.weaponNext ===
+                "function" &&
+            controls.weaponNext()
         ) {
 
             this.next();
@@ -164,7 +225,9 @@ export default class WeaponManager {
         }
 
         if (
-            this.player.input.weaponPrevious()
+            typeof controls.weaponPrevious ===
+                "function" &&
+            controls.weaponPrevious()
         ) {
 
             this.previous();
@@ -175,9 +238,20 @@ export default class WeaponManager {
 
     handleReload() {
 
+        const controls =
+            this.getControls();
+
         if (
-            this.player.input.reload()
+            !controls ||
+            typeof controls.reload !==
+                "function"
         ) {
+
+            return;
+
+        }
+
+        if (controls.reload()) {
 
             this.reload();
 
@@ -187,8 +261,21 @@ export default class WeaponManager {
 
     handleFireInput() {
 
+        const controls =
+            this.getControls();
+
+        if (
+            !controls ||
+            typeof controls.fire !==
+                "function"
+        ) {
+
+            return;
+
+        }
+
         const triggerDown =
-            this.player.input.fire();
+            controls.fire();
 
         if (!triggerDown) {
 
@@ -199,27 +286,34 @@ export default class WeaponManager {
 
         }
 
-        const weapon =
-            this.weapon;
+        if (!this.weapon) {
 
-        if (!weapon) {
             return;
+
         }
 
         const shouldShoot =
-            weapon.automatic ||
+
+            this.weapon.automatic ||
+
             !this.triggerWasDown;
 
         this.triggerWasDown =
             true;
 
         if (!shouldShoot) {
+
             return;
+
         }
 
         this.tryFire();
 
     }
+
+    // =====================================
+    // SHOOTING
+    // =====================================
 
     tryFire() {
 
@@ -227,14 +321,18 @@ export default class WeaponManager {
             this.weapon;
 
         if (!weapon) {
+
             return false;
+
         }
 
-        const time =
+        const now =
             this.scene.time.now;
 
         if (
-            !weapon.canShoot(time)
+            !weapon.canShoot(
+                now
+            )
         ) {
 
             if (
@@ -251,40 +349,60 @@ export default class WeaponManager {
         }
 
         const renderer =
-            this.player.weaponRenderer;
+            this.player
+                .weaponRenderer;
 
-        const projectileSystem =
-            this.scene.projectileSystem;
-
-        if (
-            !renderer ||
-            !projectileSystem
-        ) {
+        if (!renderer) {
 
             return false;
 
         }
 
         const muzzle =
-            renderer.getMuzzlePosition();
+            renderer
+                .getMuzzlePosition();
 
         if (!muzzle) {
+
             return false;
+
+        }
+
+        const projectileSystem =
+            this.scene
+                .projectileSystem;
+
+        if (!projectileSystem) {
+
+            console.warn(
+                "[WeaponManager] ProjectileSystem não encontrado."
+            );
+
+            return false;
+
         }
 
         weapon.registerShot(
-            time
+            now
         );
 
         projectileSystem.fireWeapon(
+
             this.player,
+
             weapon,
+
             muzzle
+
         );
 
         return true;
 
     }
+
+    // =====================================
+    // RELOAD
+    // =====================================
 
     reload() {
 
@@ -329,7 +447,9 @@ export default class WeaponManager {
 
     cancelReload() {
 
-        if (this.reloadEvent) {
+        if (
+            this.reloadEvent
+        ) {
 
             this.reloadEvent.remove(
                 false
@@ -340,7 +460,9 @@ export default class WeaponManager {
 
         }
 
-        if (this.weapon) {
+        if (
+            this.weapon
+        ) {
 
             this.weapon.reloading =
                 false;
@@ -353,11 +475,23 @@ export default class WeaponManager {
 
         this.cancelReload();
 
-        this.inventory.weapons.length =
-            0;
+        if (
+            this.inventory
+        ) {
 
-        this.weapon =
-            null;
+            this.inventory
+                .weapons
+                .length = 0;
+
+        }
+
+        this.weapon = null;
+
+        this.playerControls = null;
+
+        this.player = null;
+
+        this.scene = null;
 
     }
 
