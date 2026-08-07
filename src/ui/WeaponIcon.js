@@ -1,39 +1,108 @@
+import WeaponSkinManager from "../weapons/WeaponSkinManager.js";
+
 export default class WeaponIcon {
 
-    constructor(scene){
+    constructor(scene) {
 
-        this.icon = scene.add.image(
+        this.scene = scene;
 
-            20,
+        this.icon = null;
 
-            110,
-
-            "weapon_pistol"
-
-        );
-
-        this.icon.setOrigin(0);
-
-        this.icon.setScale(2);
-
-        this.icon.setScrollFactor(0);
+        this.currentTexture =
+            null;
 
     }
 
-    update(player){
+    update(player) {
 
         const weapon =
+            player?.weaponManager
+                ?.getWeapon();
 
-            player.weaponManager.weapon;
+        if (!weapon) {
 
-        if(!weapon)
+            this.setVisible(false);
+
             return;
 
-        this.icon.setTexture(
+        }
 
-            weapon.sprite
+        const texture =
+            WeaponSkinManager.texture(
+                weapon.id,
+                weapon.skin
+            );
 
-        );
+        if (
+            !texture ||
+            !this.scene.textures.exists(
+                texture
+            )
+        ) {
+
+            this.setVisible(false);
+
+            return;
+
+        }
+
+        if (!this.icon) {
+
+            this.icon =
+                this.scene.add.image(
+
+                    20,
+                    88,
+                    texture
+
+                );
+
+            this.icon
+                .setOrigin(0)
+                .setScrollFactor(0)
+                .setDepth(1000);
+
+        }
+
+        if (
+            this.currentTexture !==
+            texture
+        ) {
+
+            this.icon.setTexture(
+                texture
+            );
+
+            this.currentTexture =
+                texture;
+
+        }
+
+        this.setVisible(true);
+
+    }
+
+    setVisible(value) {
+
+        if (this.icon) {
+
+            this.icon.setVisible(
+                value
+            );
+
+        }
+
+    }
+
+    destroy() {
+
+        if (this.icon) {
+
+            this.icon.destroy();
+
+            this.icon = null;
+
+        }
 
     }
 

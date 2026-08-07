@@ -1,78 +1,275 @@
 import Phaser from "phaser";
 
-import Player from "../entities/player/Player.js";
+import Player
+    from "../entities/player/Player.js";
 
-import InputManager from "../core/InputManager.js";
-import CameraManager from "../core/CameraManager.js";
-import AnimationFactory from "../animation/AnimationFactory.js";
-import BulletManager from "../projectiles/BulletManager.js";
+import InputManager
+    from "../core/InputManager.js";
 
-export default class Level1Scene extends Phaser.Scene {
+import CameraManager
+    from "../core/CameraManager.js";
+
+import AnimationFactory
+    from "../animation/AnimationFactory.js";
+
+import CombatSystem
+    from "../systems/combat/CombatSystem.js";
+
+import HUDSystem
+    from "../systems/ui/HUDSystem.js";
+
+export default class Level1Scene
+    extends Phaser.Scene {
 
     constructor() {
-        super("Level1Scene");
-    }
 
+        super({
+            key: "Level1Scene"
+        });
+
+    }
 
     create() {
 
-        this.physics.world.setBounds(0, 0, 3000, 720);
+        // =====================================
+        // WORLD
+        // =====================================
 
-        this.inputManager = new InputManager(this);
+        this.worldWidth =
+            3000;
 
-        this.ground = this.physics.add.staticGroup();
+        this.worldHeight =
+            720;
 
-        this.hud = new HUD(this);
+        this.physics.world.setBounds(
 
-        for (let i = 0; i < 50; i++) {
+            0,
+            0,
 
-            this.ground.create(
-                i * 64,
-                688,
-                "__ground"
-            ).setOrigin(0);
+            this.worldWidth,
+            this.worldHeight
 
-        }
-
-        AnimationFactory.create(this);
-
-        this.player = new Player(
-            this,
-            150,
-            400
         );
 
-        this.bullets = new BulletManager(this);
+        // =====================================
+        // INPUT
+        // =====================================
 
-        this.physics.add.collider(
-            this.player,
-            this.ground
+        this.inputManager =
+            new InputManager(
+                this
+            );
+
+        // =====================================
+        // TEMPORARY GROUND
+        // =====================================
+
+        /*
+            O mapa real ainda será integrado
+            depois.
+
+            Por enquanto usamos um Rectangle
+            físico para não depender de
+            __ground ou tilemap.
+        */
+
+        this.ground =
+            this.add.rectangle(
+
+                this.worldWidth / 2,
+
+                680,
+
+                this.worldWidth,
+
+                80,
+
+                0x20242e
+
+            );
+
+        this.physics.add.existing(
+
+            this.ground,
+
+            true
+
         );
 
-        this.cameraManager = new CameraManager(this);
+        // =====================================
+        // ANIMATIONS
+        // =====================================
 
-        this.cameraManager.follow(this.player);
+        AnimationFactory.create(
+            this
+        );
+
+        // =====================================
+        // COMBAT
+        // =====================================
+
+        this.combatSystem =
+            new CombatSystem(
+                this
+            );
+
+        /*
+            Compatibilidade temporária
+            com WeaponManager.
+
+            Depois WeaponManager poderá
+            acessar diretamente CombatSystem.
+        */
+
+        this.projectileSystem =
+            this.combatSystem
+                .getProjectileSystem();
+
+        // =====================================
+        // PLAYER
+        // =====================================
+
+        this.player =
+            new Player(
+
+                this,
+
+                180,
+                400
+
+            );
+
+        // =====================================
+        // COLLISION
+        // =====================================
+
+        this.combatSystem
+            .collisions
+            .addPlayerGround(
+
+                this.player,
+
+                this.ground
+
+            );
+
+        // =====================================
+        // CAMERA
+        // =====================================
+
+        this.cameraManager =
+            new CameraManager(
+                this
+            );
+
+        this.cameraManager.follow(
+            this.player
+        );
 
         this.cameraManager.setBounds(
-            3000,
-            720
+
+            this.worldWidth,
+
+            this.worldHeight
+
         );
 
-        this.cameraManager.setZoom(1);
+        this.cameraManager.setZoom(
+            1
+        );
+
+        // =====================================
+        // HUD
+        // =====================================
+
+        this.hudSystem =
+            new HUDSystem(
+                this
+            );
+
+        // =====================================
+        // CLEANUP
+        // =====================================
+
+        this.events.once(
+
+            Phaser.Scenes.Events.SHUTDOWN,
+
+            this.shutdown,
+
+            this
+
+        );
 
     }
 
     update() {
 
-        this.player.update();
+        if (
+            !this.player ||
+            !this.player.active
+        ) {
 
-        this.hud.update(this.player);
-
-        if (this.input.activePointer.isDown) {
-
-            this.bullets.shoot(this.player);
+            return;
 
         }
+
+        // PLAYER
+
+        this.player.update();
+
+        // CAMERA
+
+        this.cameraManager.update(
+            this.player
+        );
+
+        // HUD
+
+        this.hudSystem.update(
+            this.player
+        );
+
+    }
+
+    shutdown() {
+
+        if (
+            this.hudSystem
+        ) {
+
+            this.hudSystem.destroy();
+
+            this.hudSystem =
+                null;
+
+        }
+
+        if (
+            this.combatSystem
+        ) {
+
+            this.combatSystem.destroy();
+
+            this.combatSystem =
+                null;
+
+        }
+
+        this.projectileSystem =
+            null;
+
+        this.player =
+            null;
+
+        this.ground =
+            null;
+
+        this.inputManager =
+            null;
+
+        this.cameraManager =
+            null;
 
     }
 

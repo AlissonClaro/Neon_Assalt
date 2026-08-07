@@ -1,48 +1,73 @@
 export default class AmmoCounter {
 
-    constructor(scene){
+    constructor(scene) {
 
-        this.text = scene.add.text(
+        this.text =
+            scene.add.text(
 
-            20,
-            55,
+                20,
+                52,
+                "",
 
-            "",
+                {
+                    fontSize: "22px",
+                    color: "#ffffff",
+                    fontFamily: "Arial"
+                }
 
-            {
+            );
 
-                fontSize:"24px",
-
-                color:"#ffffff",
-
-                fontFamily:"Arial"
-
-            }
-
-        );
-
-        this.text.setScrollFactor(0);
+        this.text
+            .setScrollFactor(0)
+            .setDepth(1000);
 
     }
 
-    update(player){
+    update(player) {
 
         const weapon =
+            player?.weaponManager
+                ?.getWeapon();
 
-            player.weaponManager.weapon;
+        if (!weapon) {
 
-        if(!weapon)
+            this.text.setText("");
+
             return;
+
+        }
+
+        if (weapon.isMelee()) {
+
+            this.text.setText(
+                weapon.name
+            );
+
+            return;
+
+        }
+
+        if (weapon.reloading) {
+
+            this.text.setText(
+                `${weapon.name}  RELOAD`
+            );
+
+            return;
+
+        }
 
         this.text.setText(
 
-            weapon.ammo +
-
-            " / " +
-
-            weapon.reserveAmmo
+            `${weapon.name}  ${weapon.ammo} / ${weapon.reserveAmmo}`
 
         );
+
+    }
+
+    destroy() {
+
+        this.text.destroy();
 
     }
 

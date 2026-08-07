@@ -1,26 +1,20 @@
-import AssetManifest from "../config/AssetManifest.js";
+import AssetManifest
+    from "../config/AssetManifest.js";
 
-import WeaponCatalog from "../config/WeaponCatalog.js";
-
-Object.entries(AssetManifest.weapons).forEach(([type, weapon]) => {
-
-    WeaponCatalog[type].forEach(model => {
-
-        scene.load.image(
-
-            `weapon_${type}_${model}`,
-
-            `${weapon.folder}${model}.png`
-
-        );
-
-    });
-
-});
+import WeaponCatalog
+    from "../config/WeaponCatalog.js";
 
 export default class AssetManager {
 
     static load(scene) {
+
+        if (!scene) {
+
+            throw new Error(
+                "AssetManager.load: Scene inválida."
+            );
+
+        }
 
         this.loadPlayer(scene);
         this.loadWeapons(scene);
@@ -39,19 +33,40 @@ export default class AssetManager {
 
     static loadPlayer(scene) {
 
-        Object.values(AssetManifest.player).forEach(asset => {
+        const assets =
+            AssetManifest.player ?? {};
+
+        Object.values(
+            assets
+        ).forEach(asset => {
+
+            if (
+                !asset.key ||
+                !asset.path ||
+                !asset.frameWidth ||
+                !asset.frameHeight
+            ) {
+
+                console.warn(
+                    "[AssetManager] Player asset inválido:",
+                    asset
+                );
+
+                return;
+
+            }
 
             scene.load.spritesheet(
 
                 asset.key,
-
                 asset.path,
 
                 {
+                    frameWidth:
+                        asset.frameWidth,
 
-                    frameWidth: asset.frameWidth,
-                    frameHeight: asset.frameHeight
-
+                    frameHeight:
+                        asset.frameHeight
                 }
 
             );
@@ -66,24 +81,50 @@ export default class AssetManager {
 
     static loadWeapons(scene) {
 
-        Object.entries(AssetManifest.weapons).forEach(
+        const weapons =
+            AssetManifest.weapons ?? {};
 
-            ([weaponType, weapon]) => {
+        Object.entries(
+            weapons
+        ).forEach(
+            ([
+                weaponType,
+                weapon
+            ]) => {
 
-                weapon.models.forEach(model => {
+                const models =
+                    WeaponCatalog[
+                        weaponType
+                    ] ?? [];
 
-                    scene.load.image(
+                if (!weapon.folder) {
 
-                        `weapon_${weaponType}_${model}`,
-
-                        `${weapon.folder}${model}.png`
-
+                    console.warn(
+                        `[AssetManager] Pasta não definida para ${weaponType}.`
                     );
 
-                });
+                    return;
+
+                }
+
+                models.forEach(
+                    model => {
+
+                        const key =
+                            `weapon_${weaponType}_${model}`;
+
+                        const path =
+                            `${weapon.folder}${model}.png`;
+
+                        scene.load.image(
+                            key,
+                            path
+                        );
+
+                    }
+                );
 
             }
-
         );
 
     }
@@ -94,52 +135,94 @@ export default class AssetManager {
 
     static loadBullets(scene) {
 
-        Object.entries(AssetManifest.bullets).forEach(
+        const bullets =
+            AssetManifest.bullets ?? {};
 
+        Object.entries(
+            bullets
+        ).forEach(
             ([key, path]) => {
 
+                if (!path) {
+                    return;
+                }
+
                 scene.load.image(
-
                     key,
-
                     path
-
                 );
 
             }
-
         );
 
     }
 
     // =====================================
-    // SHOOT EFFECTS
+    // EFFECTS
     // =====================================
 
     static loadEffects(scene) {
 
-        Object.entries(AssetManifest.effects).forEach(
+        const effects =
+            AssetManifest.effects ?? {};
 
-            ([key, path]) => {
+        Object.entries(
+            effects
+        ).forEach(
+            ([key, asset]) => {
 
-                scene.load.spritesheet(
+                if (!asset) {
+                    return;
+                }
 
+                if (
+                    typeof asset ===
+                    "string"
+                ) {
+
+                    scene.load.image(
+                        key,
+                        asset
+                    );
+
+                    return;
+
+                }
+
+                if (!asset.path) {
+                    return;
+                }
+
+                if (
+                    asset.frameWidth &&
+                    asset.frameHeight
+                ) {
+
+                    scene.load.spritesheet(
+
+                        key,
+                        asset.path,
+
+                        {
+                            frameWidth:
+                                asset.frameWidth,
+
+                            frameHeight:
+                                asset.frameHeight
+                        }
+
+                    );
+
+                    return;
+
+                }
+
+                scene.load.image(
                     key,
-
-                    path,
-
-                    {
-
-                        frameWidth: 48,
-
-                        frameHeight: 48
-
-                    }
-
+                    asset.path
                 );
 
             }
-
         );
 
     }
@@ -150,23 +233,38 @@ export default class AssetManager {
 
     static loadMaps(scene) {
 
-        Object.values(AssetManifest.maps).forEach(map => {
+        const maps =
+            AssetManifest.maps ?? {};
+
+        Object.values(
+            maps
+        ).forEach(map => {
+
+            if (
+                !map.key ||
+                !map.json
+            ) {
+
+                return;
+
+            }
 
             scene.load.tilemapTiledJSON(
-
                 map.key,
-
                 map.json
-
             );
 
-            scene.load.image(
-
-                map.tilesetKey,
-
+            if (
+                map.tilesetKey &&
                 map.tileset
+            ) {
 
-            );
+                scene.load.image(
+                    map.tilesetKey,
+                    map.tileset
+                );
+
+            }
 
         });
 
@@ -178,20 +276,24 @@ export default class AssetManager {
 
     static loadAudio(scene) {
 
-        Object.entries(AssetManifest.audio).forEach(
+        const audio =
+            AssetManifest.audio ?? {};
 
+        Object.entries(
+            audio
+        ).forEach(
             ([key, path]) => {
 
+                if (!path) {
+                    return;
+                }
+
                 scene.load.audio(
-
                     key,
-
                     path
-
                 );
 
             }
-
         );
 
     }
@@ -202,22 +304,49 @@ export default class AssetManager {
 
     static loadEnemies(scene) {
 
-        Object.values(AssetManifest.enemies).forEach(enemy => {
+        const enemies =
+            AssetManifest.enemies ?? {};
 
-            scene.load.spritesheet(
+        Object.values(
+            enemies
+        ).forEach(enemy => {
 
+            if (
+                !enemy.key ||
+                !enemy.path
+            ) {
+
+                return;
+
+            }
+
+            if (
+                enemy.frameWidth &&
+                enemy.frameHeight
+            ) {
+
+                scene.load.spritesheet(
+
+                    enemy.key,
+                    enemy.path,
+
+                    {
+                        frameWidth:
+                            enemy.frameWidth,
+
+                        frameHeight:
+                            enemy.frameHeight
+                    }
+
+                );
+
+                return;
+
+            }
+
+            scene.load.image(
                 enemy.key,
-
-                enemy.path,
-
-                {
-
-                    frameWidth: enemy.frameWidth,
-
-                    frameHeight: enemy.frameHeight
-
-                }
-
+                enemy.path
             );
 
         });
@@ -230,24 +359,26 @@ export default class AssetManager {
 
     static loadUI(scene) {
 
-        Object.entries(AssetManifest.ui).forEach(
+        const ui =
+            AssetManifest.ui ?? {};
 
+        Object.entries(
+            ui
+        ).forEach(
             ([key, path]) => {
 
+                if (!path) {
+                    return;
+                }
+
                 scene.load.image(
-
                     key,
-
                     path
-
                 );
 
             }
-
         );
 
     }
-
-    
 
 }

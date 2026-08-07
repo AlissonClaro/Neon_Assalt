@@ -1,4 +1,4 @@
-export default {
+const PlayerState = Object.freeze({
 
     IDLE: "idle",
 
@@ -24,4 +24,6 @@ export default {
 
     DEAD: "dead"
 
-};
+});
+
+export default PlayerState;

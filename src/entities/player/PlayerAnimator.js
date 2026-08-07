@@ -1,64 +1,88 @@
-import PlayerState from "./states/PlayerState.js";
+import PlayerState
+    from "./states/PlayerState.js";
 
 export default class PlayerAnimator {
 
-    constructor(player) {
+    constructor(
+        player,
+        animationController
+    ) {
 
-        this.player = player;
+        this.player =
+            player;
 
-        this.sprite = player;
+        this.animation =
+            animationController;
 
     }
 
     update() {
 
-        switch (this.player.stateMachine.current) {
+        const state =
+            this.player
+                .stateMachine
+                .current;
 
-            case PlayerState.IDLE:
-
-                this.play("player_idle");
-                break;
+        switch (state) {
 
             case PlayerState.WALK:
 
-                this.play("player_walk");
+                this.animation.play(
+                    "player_walk"
+                );
+
                 break;
 
             case PlayerState.RUN:
 
-                this.play("player_run");
+                this.animation.play(
+                    "player_run"
+                );
+
                 break;
 
             case PlayerState.JUMP:
 
-                this.play("player_jump");
+                this.animation.play(
+                    "player_jump"
+                );
+
                 break;
 
             case PlayerState.FALL:
 
-                this.play("player_fall");
+                this.animation.play(
+                    "player_fall"
+                );
+
                 break;
 
             case PlayerState.LAND:
 
-                this.play("player_land");
+                this.animation.play(
+                    "player_land"
+                );
+
                 break;
 
             case PlayerState.ROLL:
 
-                this.play("player_roll");
+                this.animation.play(
+                    "player_roll"
+                );
+
+                break;
+
+            case PlayerState.IDLE:
+            default:
+
+                this.animation.play(
+                    "player_idle"
+                );
+
                 break;
 
         }
-
-    }
-
-    play(key) {
-
-        if (this.sprite.anims.currentAnim?.key === key)
-            return;
-
-        this.sprite.play(key);
 
     }
 

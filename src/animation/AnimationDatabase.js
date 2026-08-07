@@ -1,16 +1,17 @@
-export default {
+const AnimationDatabase = {
 
     idle: {
 
-        key: "idle",
+        key:
+            "player_idle",
 
-        sprite: "player_idle",
+        texture:
+            "player_walk",
 
         start: 0,
+        end: 0,
 
-        end: 9,
-
-        frameRate: 8,
+        frameRate: 1,
 
         repeat: -1
 
@@ -18,12 +19,13 @@ export default {
 
     walk: {
 
-        key: "walk",
+        key:
+            "player_walk",
 
-        sprite: "player_walk",
+        texture:
+            "player_walk",
 
         start: 0,
-
         end: 11,
 
         frameRate: 12,
@@ -34,15 +36,16 @@ export default {
 
     run: {
 
-        key: "run",
+        key:
+            "player_run",
 
-        sprite: "player_run",
+        texture:
+            "player_run",
 
         start: 0,
+        end: 11,
 
-        end: 7,
-
-        frameRate: 18,
+        frameRate: 16,
 
         repeat: -1
 
@@ -50,13 +53,14 @@ export default {
 
     jump: {
 
-        key: "jump",
+        key:
+            "player_jump",
 
-        sprite: "player_jump",
+        texture:
+            "player_jump",
 
         start: 0,
-
-        end: 7,
+        end: 9,
 
         frameRate: 14,
 
@@ -66,28 +70,30 @@ export default {
 
     fall: {
 
-        key: "fall",
+        key:
+            "player_fall",
 
-        sprite: "player_fall",
+        texture:
+            "player_fall",
 
         start: 0,
-
-        end: 6,
+        end: 10,
 
         frameRate: 12,
 
-        repeat: 0
+        repeat: -1
 
     },
 
     land: {
 
-        key: "land",
+        key:
+            "player_land",
 
-        sprite: "player_land",
+        texture:
+            "player_land",
 
         start: 0,
-
         end: 5,
 
         frameRate: 14,
@@ -98,18 +104,21 @@ export default {
 
     roll: {
 
-        key: "roll",
+        key:
+            "player_roll",
 
-        sprite: "player_roll",
+        texture:
+            "player_roll",
 
         start: 0,
+        end: 8,
 
-        end: 9,
-
-        frameRate: 18,
+        frameRate: 16,
 
         repeat: 0
 
     }
 
 };
+
+export default AnimationDatabase;

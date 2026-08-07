@@ -1,10 +1,14 @@
 import Socket from "./Socket.js";
 
-export default class RightHandSocket extends Socket {
+export default class RightHandSocket
+    extends Socket {
 
     constructor() {
 
-        super(18, -10);
+        super(
+            18,
+            -10
+        );
 
     }
 

@@ -1,4 +1,4 @@
-import Phaser from "phaser";
+import Entity from "../core/Entity.js";
 
 import PlayerStats from "./PlayerStats.js";
 import PlayerHealth from "./PlayerHealth.js";
@@ -19,22 +19,16 @@ import WeaponRenderer from "../../weapons/WeaponRenderer.js";
 
 import RightHandSocket from "./sockets/RightHandSocket.js";
 
-import Entity from "../Entity.js";
-
 export default class Player extends Entity {
 
     constructor(scene, x, y) {
 
         super(
-
             scene,
-
             x,
-
             y,
-
-            "player_idle"
-
+            "player_walk",
+            0
         );
 
         this.initialize();
@@ -43,77 +37,108 @@ export default class Player extends Entity {
 
     initialize() {
 
-        /* ===========================
-           Física
-        =========================== */
+        // ======================================
+        // PHYSICS
+        // ======================================
 
         this.setCollideWorldBounds(true);
-
-        this.body.setGravityY(1000);
 
         this.setBounce(0);
 
         this.setDragX(1200);
 
-        this.setMaxVelocity(400, 900);
+        this.setMaxVelocity(
+            400,
+            900
+        );
 
         this.setDepth(10);
 
-        this.handSocket =
+        // A gravidade principal já vem do Game.js.
+        // Não adicionamos mais +1000 aqui para evitar
+        // duplicar a gravidade do mundo.
 
+        // ======================================
+        // SOCKETS
+        // ======================================
+
+        this.handSocket =
             new RightHandSocket();
 
-        /* ===========================
-           Componentes
-        =========================== */
+        // ======================================
+        // PLAYER COMPONENTS
+        // ======================================
 
-        this.stats = new PlayerStats();
+        this.stats =
+            new PlayerStats();
 
-        this.health = new PlayerHealth();
+        this.health =
+            new PlayerHealth(
+                this.stats.maxLife
+            );
 
-        this.inventory = new PlayerInventory();
+        this.inventory =
+            new PlayerInventory();
 
-        this.input = new PlayerInput(this.scene);
+        this.input =
+            new PlayerInput(
+                this.scene
+            );
 
-        this.physicsController = new PlayerPhysics(this);
+        this.physicsController =
+            new PlayerPhysics(this);
 
-        this.movement = new PlayerMovement(this);
+        this.movement =
+            new PlayerMovement(this);
 
-        this.stateMachine = new PlayerStateMachine();
+        this.stateMachine =
+            new PlayerStateMachine();
 
-        /* ===========================
-           Sistema de animação
-        =========================== */
+        // ======================================
+        // ANIMATION
+        // ======================================
 
-        this.animation = new AnimationController(this);
+        this.animation =
+            new AnimationController(this);
 
-        this.animator = new PlayerAnimator(
-            this,
-            this.animation
+        this.animator =
+            new PlayerAnimator(
+                this,
+                this.animation
+            );
+
+        // ======================================
+        // WEAPONS
+        // ======================================
+
+        this.weaponManager =
+            new WeaponManager(this);
+
+        this.weaponRenderer =
+            new WeaponRenderer(
+                this.scene,
+                this.weaponManager
+            );
+
+        this.weaponManager.equip(
+            "pistol",
+            "1"
         );
 
-        /* ===========================
-           Sistema de armas
-        =========================== */
+        // ======================================
+        // CONTROLLER
+        // ======================================
 
-        this.weaponManager = new WeaponManager(this);
-
-        this.weaponRenderer = new WeaponRenderer(
-            this.scene,
-            this.weaponManager
-        );
-
-        this.weaponManager.equip("pistol");
-
-        /* ===========================
-           Controle
-        =========================== */
-
-        this.controller = new PlayerController(this);
+        this.controller =
+            new PlayerController(this);
 
     }
 
     update() {
+
+        if (!this.alive) {
+            return;
+        }
 
         this.controller.update();
 

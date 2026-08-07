@@ -1,36 +1,45 @@
-export default class Crosshair{
+export default class Crosshair {
 
-    constructor(scene){
+    constructor(scene) {
 
         this.scene = scene;
 
-        this.sprite = scene.add.image(
+        this.sprite =
+            scene.add.image(
+                0,
+                0,
+                "crosshair"
+            );
 
-            0,
+        this.sprite
+            .setScrollFactor(0)
+            .setDepth(2000);
 
-            0,
-
-            "crosshair"
-
+        scene.input.setDefaultCursor(
+            "none"
         );
-
-        this.sprite.setDepth(999);
 
     }
 
-    update(){
+    update() {
 
         const pointer =
-
             this.scene.input.activePointer;
 
-        this.sprite.x =
+        this.sprite.setPosition(
+            pointer.x,
+            pointer.y
+        );
 
-            pointer.worldX;
+    }
 
-        this.sprite.y =
+    destroy() {
 
-            pointer.worldY;
+        this.scene.input.setDefaultCursor(
+            "default"
+        );
+
+        this.sprite.destroy();
 
     }
 

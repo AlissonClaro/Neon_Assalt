@@ -4,25 +4,52 @@ export default class AnimationController {
 
         this.sprite = sprite;
 
-        this.current = null;
-
     }
 
-    play(key, ignoreIfPlaying = true) {
+    play(
+        key,
+        ignoreIfPlaying = true
+    ) {
 
-        if (this.current === key && ignoreIfPlaying) {
-            return;
+        if (!key) {
+            return false;
         }
 
-        this.current = key;
+        if (
+            !this.sprite.scene.anims.exists(
+                key
+            )
+        ) {
 
-        this.sprite.play(key, true);
+            console.warn(
+                `[AnimationController] Animação inexistente: ${key}`
+            );
+
+            return false;
+
+        }
+
+        if (
+            ignoreIfPlaying &&
+            this.sprite.anims
+                .currentAnim?.key === key &&
+            this.sprite.anims.isPlaying
+        ) {
+
+            return true;
+
+        }
+
+        this.sprite.play(
+            key,
+            ignoreIfPlaying
+        );
+
+        return true;
 
     }
 
     stop() {
-
-        this.current = null;
 
         this.sprite.stop();
 
@@ -30,7 +57,25 @@ export default class AnimationController {
 
     getCurrent() {
 
-        return this.current;
+        return (
+            this.sprite.anims
+                .currentAnim?.key ??
+            null
+        );
+
+    }
+
+    isPlaying(key) {
+
+        return (
+
+            this.sprite.anims
+                .currentAnim?.key === key &&
+
+            this.sprite.anims
+                .isPlaying
+
+        );
 
     }
 

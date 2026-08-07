@@ -6,41 +6,72 @@ export default class PlayerMovement {
 
     }
 
-    walkLeft(speed) {
+    moveLeft(speed) {
 
-        this.player.setVelocityX(-speed);
+        this.player.setVelocityX(
+            -Math.abs(speed)
+        );
 
-        this.player.setFlipX(true);
-
-    }
-
-    walkRight(speed) {
-
-        this.player.setVelocityX(speed);
-
-        this.player.setFlipX(false);
+        this.player.setFlipX(
+            true
+        );
 
     }
 
-    stop() {
+    moveRight(speed) {
 
-        this.player.setVelocityX(0);
+        this.player.setVelocityX(
+            Math.abs(speed)
+        );
+
+        this.player.setFlipX(
+            false
+        );
+
+    }
+
+    stopHorizontal() {
+
+        this.player.setVelocityX(
+            0
+        );
 
     }
 
     jump(force) {
 
-        this.player.setVelocityY(-force);
+        this.player.setVelocityY(
+            -Math.abs(force)
+        );
 
     }
 
     dash(force) {
 
         const direction =
-            this.player.flipX ? -1 : 1;
+            this.player.flipX
+                ? -1
+                : 1;
 
         this.player.setVelocityX(
-            direction * force
+
+            direction *
+            Math.abs(force)
+
+        );
+
+    }
+
+    knockback(
+        forceX,
+        forceY = 0
+    ) {
+
+        this.player.setVelocity(
+
+            forceX,
+            forceY
+
         );
 
     }

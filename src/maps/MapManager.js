@@ -6,47 +6,75 @@ export default class MapManager {
 
     }
 
-    createLevel(name) {
+    createLevel({
 
-        const map = this.scene.make.tilemap({
+        mapKey,
 
-            key: name
+        tilesetName,
 
-        });
+        tilesetKey,
 
-        const tiles = map.addTilesetImage(
+        groundLayer = "Ground",
 
-            "neon_tiles",
+        collisionLayer = "Collision",
 
-            "neon_tiles"
+        collisionProperty = "collides"
 
-        );
+    }) {
 
-        const ground = map.createLayer(
+        const map =
+            this.scene.make.tilemap({
 
-            "Ground",
+                key: mapKey
 
-            tiles
+            });
 
-        );
+        const tileset =
+            map.addTilesetImage(
 
-        const collision = map.createLayer(
+                tilesetName,
+                tilesetKey
 
-            "Collision",
+            );
 
-            tiles
+        if (!tileset) {
 
-        );
+            throw new Error(
+                `[MapManager] Tileset não encontrado: ${tilesetName}`
+            );
 
-        collision.setCollisionByProperty({
+        }
 
-            collides: true
+        const ground =
+            map.createLayer(
 
-        });
+                groundLayer,
+                tileset
+
+            );
+
+        const collision =
+            map.createLayer(
+
+                collisionLayer,
+                tileset
+
+            );
+
+        if (collision) {
+
+            collision.setCollisionByProperty({
+
+                [collisionProperty]: true
+
+            });
+
+        }
 
         return {
 
             map,
+            tileset,
             ground,
             collision
 

@@ -1,130 +1,102 @@
-import Phaser from "phaser";
+export default class PlayerPhysics {
 
-import PlayerStats from "./PlayerStats.js";
-import PlayerHealth from "./PlayerHealth.js";
-import PlayerInventory from "./PlayerInventory.js";
+    constructor(player) {
 
-import PlayerInput from "./PlayerInput.js";
-import PlayerPhysics from "./PlayerPhysics.js";
-import PlayerMovement from "./PlayerMovement.js";
-
-import PlayerController from "./PlayerController.js";
-import PlayerStateMachine from "./PlayerStateMachine.js";
-import PlayerAnimator from "./PlayerAnimator.js";
-
-import AnimationController from "../../animation/AnimationController.js";
-
-import WeaponManager from "../../weapons/WeaponManager.js";
-import WeaponRenderer from "../../weapons/WeaponRenderer.js";
-
-import RightHandSocket from "./sockets/RightHandSocket.js";
-
-export default class Player extends Phaser.Physics.Arcade.Sprite {
-
-    constructor(scene, x, y) {
-
-        super(scene, x, y, "player_idle");
-
-        scene.add.existing(this);
-        scene.physics.add.existing(this);
-
-        this.initialize();
+        this.player = player;
 
     }
 
-    initialize() {
+    get body() {
 
-        /* ===========================
-           Física
-        =========================== */
-
-        this.setCollideWorldBounds(true);
-
-        this.body.setGravityY(1000);
-
-        this.setBounce(0);
-
-        this.setDragX(1200);
-
-        this.setMaxVelocity(400, 900);
-
-        this.setDepth(10);
-
-        this.handSocket =
-
-    new RightHandSocket();
-
-        /* ===========================
-           Componentes
-        =========================== */
-
-        this.stats = new PlayerStats();
-
-        this.health = new PlayerHealth();
-
-        this.inventory = new PlayerInventory();
-
-        this.input = new PlayerInput(this.scene);
-
-        this.physicsController = new PlayerPhysics(this);
-
-        this.movement = new PlayerMovement(this);
-
-        this.stateMachine = new PlayerStateMachine();
-
-        /* ===========================
-           Sistema de animação
-        =========================== */
-
-        this.animation = new AnimationController(this);
-
-        this.animator = new PlayerAnimator(
-            this,
-            this.animation
-        );
-
-        /* ===========================
-           Sistema de armas
-        =========================== */
-
-        this.weaponManager = new WeaponManager(this);
-
-        this.weaponRenderer = new WeaponRenderer(
-            this.scene,
-            this.weaponManager
-        );
-
-        this.weaponManager.equip("pistol");
-
-        /* ===========================
-           Controle
-        =========================== */
-
-        this.controller = new PlayerController(this);
+        return this.player.body;
 
     }
 
-    update() {
+    isGrounded() {
 
-        this.controller.update();
+        if (!this.body) {
 
-        this.animator.update();
-
-        this.weaponManager.update();
-
-        this.weaponRenderer.update(this);
-
-    }
-
-    destroy(fromScene) {
-
-        if (this.weaponRenderer) {
-
-            this.weaponRenderer.destroy();
+            return false;
 
         }
 
-        super.destroy(fromScene);
+        return (
+
+            this.body.blocked.down ||
+
+            this.body.touching.down
+
+        );
+
+    }
+
+    isFalling() {
+
+        if (!this.body) {
+
+            return false;
+
+        }
+
+        return (
+
+            !this.isGrounded() &&
+
+            this.body.velocity.y > 30
+
+        );
+
+    }
+
+    isRising() {
+
+        if (!this.body) {
+
+            return false;
+
+        }
+
+        return (
+
+            !this.isGrounded() &&
+
+            this.body.velocity.y < -30
+
+        );
+
+    }
+
+    velocityX() {
+
+        return (
+            this.body?.velocity.x ??
+            0
+        );
+
+    }
+
+    velocityY() {
+
+        return (
+            this.body?.velocity.y ??
+            0
+        );
+
+    }
+
+    speedX() {
+
+        return Math.abs(
+            this.velocityX()
+        );
+
+    }
+
+    speedY() {
+
+        return Math.abs(
+            this.velocityY()
+        );
 
     }
 

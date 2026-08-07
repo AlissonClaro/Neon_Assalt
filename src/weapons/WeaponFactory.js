@@ -1,21 +1,34 @@
 import Weapon from "./Weapon.js";
 import WeaponDatabase from "./WeaponDatabase.js";
+import WeaponSkinManager from "./WeaponSkinManager.js";
 
 export default class WeaponFactory {
 
-    static create(name) {
+    static create(type, skin = null) {
 
-        const data = WeaponDatabase[name];
+        const data =
+            WeaponDatabase[type];
 
         if (!data) {
 
-            console.warn("Arma não encontrada:", name);
+            console.warn(
+                `[WeaponFactory] Arma não encontrada: ${type}`
+            );
 
             return null;
 
         }
 
-        return new Weapon(data);
+        const resolvedSkin =
+            WeaponSkinManager.resolveSkin(
+                type,
+                skin
+            );
+
+        return new Weapon(
+            data,
+            resolvedSkin
+        );
 
     }
 

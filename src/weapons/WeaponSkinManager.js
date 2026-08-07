@@ -1,14 +1,85 @@
+import WeaponCatalog from "../config/WeaponCatalog.js";
+
 export default class WeaponSkinManager {
 
-    constructor(scene){
+    static getModels(type) {
 
-        this.scene = scene;
+        return WeaponCatalog[type] ?? [];
 
     }
 
-    texture(type,id){
+    static hasSkin(type, skin) {
 
-        return `weapon_${type}_${id}`;
+        const models =
+            this.getModels(type);
+
+        return models
+            .map(String)
+            .includes(String(skin));
+
+    }
+
+    static getDefaultSkin(type) {
+
+        const models =
+            this.getModels(type);
+
+        if (models.length === 0) {
+
+            return null;
+
+        }
+
+        return String(models[0]);
+
+    }
+
+    static resolveSkin(type, requestedSkin = null) {
+
+        if (
+            requestedSkin !== null &&
+            this.hasSkin(type, requestedSkin)
+        ) {
+
+            return String(requestedSkin);
+
+        }
+
+        return this.getDefaultSkin(type);
+
+    }
+
+    static texture(type, skin) {
+
+        if (!type || skin === null) {
+
+            return null;
+
+        }
+
+        return `weapon_${type}_${skin}`;
+
+    }
+
+    static random(type) {
+
+        const models =
+            this.getModels(type);
+
+        if (models.length === 0) {
+
+            return null;
+
+        }
+
+        const index =
+            Math.floor(
+                Math.random() * models.length
+            );
+
+        return String(
+            models[index]
+        );
 
     }
 

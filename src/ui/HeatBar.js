@@ -1,38 +1,104 @@
-export default class HealthBar {
+import Phaser from "phaser";
+
+export default class HeatBar {
 
     constructor(scene) {
 
-        this.scene = scene;
+        this.scene =
+            scene;
 
-        this.graphics = scene.add.graphics();
+        this.graphics =
+            scene.add.graphics();
 
-        this.graphics.setScrollFactor(0);
+        this.graphics
+            .setScrollFactor(0)
+            .setDepth(1000);
+
+        this.x = 20;
+        this.y = 84;
+
+        this.width = 180;
+        this.height = 10;
 
     }
 
-    update(player) {
+    update(
+        value = 0,
+        max = 100
+    ) {
 
-        const max = player.health.maxHealth;
-        const hp = player.health.currentHealth;
+        const safeMax =
+            Math.max(
+                1,
+                max
+            );
 
-        const width = 220;
-        const height = 20;
+        const current =
+            Phaser.Math.Clamp(
+                value,
+                0,
+                safeMax
+            );
+
+        const ratio =
+            current /
+            safeMax;
 
         this.graphics.clear();
 
-        // fundo
-        this.graphics.fillStyle(0x222222);
-        this.graphics.fillRoundedRect(20,20,width,height,5);
-
-        // vida
-        this.graphics.fillStyle(0x00ff66);
-        this.graphics.fillRoundedRect(
-            20,
-            20,
-            width*(hp/max),
-            height,
-            5
+        this.graphics.fillStyle(
+            0x161616,
+            0.85
         );
+
+        this.graphics.fillRect(
+
+            this.x,
+            this.y,
+
+            this.width,
+            this.height
+
+        );
+
+        this.graphics.fillStyle(
+            0xffffff,
+            1
+        );
+
+        this.graphics.fillRect(
+
+            this.x,
+            this.y,
+
+            this.width *
+            ratio,
+
+            this.height
+
+        );
+
+    }
+
+    hide() {
+
+        this.graphics.setVisible(
+            false
+        );
+
+    }
+
+    show() {
+
+        this.graphics.setVisible(
+            true
+        );
+
+    }
+
+    destroy() {
+
+        this.graphics.destroy();
 
     }
 

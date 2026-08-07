@@ -1,35 +1,74 @@
-import AnimationDatabase from "./AnimationDatabase.js";
+import AnimationDatabase
+    from "./AnimationDatabase.js";
 
 export default class AnimationFactory {
 
     static create(scene) {
 
-        Object.values(AnimationDatabase).forEach(animation => {
+        if (!scene?.anims) {
 
-            if (scene.anims.exists(animation.key)) {
+            throw new Error(
+                "AnimationFactory.create: Scene inválida."
+            );
+
+        }
+
+        Object.values(
+            AnimationDatabase
+        ).forEach(animation => {
+
+            if (
+                scene.anims.exists(
+                    animation.key
+                )
+            ) {
+
                 return;
+
             }
+
+            if (
+                !scene.textures.exists(
+                    animation.texture
+                )
+            ) {
+
+                console.warn(
+                    `[AnimationFactory] Textura ausente: ${animation.texture}`
+                );
+
+                return;
+
+            }
+
+            const frames =
+                scene.anims
+                    .generateFrameNumbers(
+
+                        animation.texture,
+
+                        {
+                            start:
+                                animation.start,
+
+                            end:
+                                animation.end
+                        }
+
+                    );
 
             scene.anims.create({
 
-                key: animation.key,
+                key:
+                    animation.key,
 
-                frames: scene.anims.generateFrameNumbers(
+                frames,
 
-                    animation.sprite,
+                frameRate:
+                    animation.frameRate,
 
-                    {
-
-                        start: animation.start,
-                        end: animation.end
-
-                    }
-
-                ),
-
-                frameRate: animation.frameRate,
-
-                repeat: animation.repeat
+                repeat:
+                    animation.repeat
 
             });
 

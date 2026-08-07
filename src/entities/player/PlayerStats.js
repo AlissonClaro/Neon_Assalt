@@ -2,16 +2,41 @@ export default class PlayerStats {
 
     constructor() {
 
-        this.walkSpeed = 220;
+        // =====================================
+        // MOVEMENT
+        // =====================================
 
-        this.runSpeed = 360;
+        this.walkSpeed =
+            220;
 
-        this.jumpForce = 520;
+        this.runSpeed =
+            360;
 
-        this.maxLife = 100;
+        this.jumpForce =
+            520;
 
-        this.life = 100;
+        this.dashForce =
+            650;
+
+        // =====================================
+        // HEALTH
+        // =====================================
+
+        this.maxLife =
+            100;
+
+        // =====================================
+        // FUTURE ATTRIBUTES
+        // =====================================
+
+        this.maxArmor =
+            100;
+
+        this.maxEnergy =
+            100;
 
     }
+
+    
 
 }

@@ -1,39 +1,66 @@
-import HealthBar from "./HealthBar.js";
-import AmmoCounter from "./AmmoCounter.js";
-import WeaponIcon from "./WeaponIcon.js";
-import Crosshair from "./Crosshair.js";
+import HUD
+    from "../../ui/HUD.js";
 
-export default class HUD{
+export default class HUDSystem {
 
-    constructor(scene){
+    constructor(scene) {
 
-        this.health =
+        this.scene =
+            scene;
 
-            new HealthBar(scene);
+        this.hud =
+            new HUD(
+                scene
+            );
 
-        this.ammo =
-
-            new AmmoCounter(scene);
-
-        this.weapon =
-
-            new WeaponIcon(scene);
-
-        this.crosshair =
-
-            new Crosshair(scene);
+        this.enabled =
+            true;
 
     }
 
-    update(player){
+    update(player) {
 
-        this.health.update(player);
+        if (
+            !this.enabled ||
+            !this.hud
+        ) {
 
-        this.ammo.update(player);
+            return;
 
-        this.weapon.update(player);
+        }
 
-        this.crosshair.update();
+        this.hud.update(
+            player
+        );
+
+    }
+
+    show() {
+
+        this.enabled =
+            true;
+
+    }
+
+    hide() {
+
+        this.enabled =
+            false;
+
+    }
+
+    destroy() {
+
+        if (this.hud) {
+
+            this.hud.destroy();
+
+            this.hud =
+                null;
+
+        }
+
+        this.scene = null;
 
     }
 

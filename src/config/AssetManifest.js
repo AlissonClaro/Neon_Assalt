@@ -1,253 +1,206 @@
-import AssetManifest from "../config/AssetManifest.js";
-
 const PLAYER_PATH = "sprites/player/";
+const WEAPON_PATH = "sprites/weapons/";
 
 const AssetManifest = {
 
-    // =====================================
+    // =====================================================
     // PLAYER
-    // =====================================
+    // =====================================================
 
     player: {
 
-        idle: {
-            key: "player_idle",
-            path: PLAYER_PATH + "Walking/Walking.png",
-            frameWidth: 128,
-            frameHeight: 128
-        },
-
         walk: {
+
             key: "player_walk",
-            path: PLAYER_PATH + "Walking/Walking.png",
+
+            path:
+                PLAYER_PATH +
+                "Walking/Walking.png",
+
             frameWidth: 128,
             frameHeight: 128
+
         },
 
         run: {
+
             key: "player_run",
-            path: PLAYER_PATH + "Running/Running.png",
+
+            path:
+                PLAYER_PATH +
+                "Running/Running.png",
+
             frameWidth: 128,
             frameHeight: 128
+
         },
 
         jump: {
+
             key: "player_jump",
-            path: PLAYER_PATH + "Jumping/Jumping.png",
+
+            path:
+                PLAYER_PATH +
+                "Jumping/Jumping.png",
+
             frameWidth: 128,
             frameHeight: 128
+
         },
 
         fall: {
+
             key: "player_fall",
-            path: PLAYER_PATH + "Falling/Falling.png",
+
+            path:
+                PLAYER_PATH +
+                "Falling/Falling.png",
+
             frameWidth: 128,
             frameHeight: 128
+
         },
 
         land: {
+
             key: "player_land",
-            path: PLAYER_PATH + "Landing/Landing.png",
+
+            path:
+                PLAYER_PATH +
+                "Landing/Landing.png",
+
             frameWidth: 128,
             frameHeight: 128
+
         },
 
         roll: {
+
             key: "player_roll",
-            path: PLAYER_PATH + "Roll/Roll.png",
+
+            path:
+                PLAYER_PATH +
+                "Roll/Roll.png",
+
             frameWidth: 128,
             frameHeight: 128
+
         }
 
     },
 
-    // =====================================
+    // =====================================================
     // WEAPONS
-    // =====================================
+    // =====================================================
 
     weapons: {
 
         pistol: {
-
-            folder: "sprites/weapons/pistol/",
-
-            models: [
-                "1","2","4","6","11","16","21",
-                "25","26","31","36","41","46"
-            ]
-
+            folder: WEAPON_PATH + "pistol/"
         },
 
         smg: {
-
-            folder: "sprites/weapons/smg/",
-
-            models: []
-
+            folder: WEAPON_PATH + "smg/"
         },
 
         shotgun: {
-
-            folder: "sprites/weapons/shotgun/",
-
-            models: []
-
+            folder: WEAPON_PATH + "shotgun/"
         },
 
         rifle: {
-
-            folder: "sprites/weapons/rifle/",
-
-            models: []
-
+            folder: WEAPON_PATH + "rifle/"
         },
 
         sniper: {
-
-            folder: "sprites/weapons/sniper/",
-
-            models: []
-
+            folder: WEAPON_PATH + "sniper/"
         },
 
         laser: {
-
-            folder: "sprites/weapons/laser/",
-
-            models: [
-                "12"
-            ]
-
+            folder: WEAPON_PATH + "laser/"
         },
 
         plasma: {
-
-            folder: "sprites/weapons/plasma/",
-
-            models: [
-                "3",
-                "7",
-                "16"
-            ]
-
+            folder: WEAPON_PATH + "plasma/"
         },
 
         rocket: {
-
-            folder: "sprites/weapons/rocket/",
-
-            models: []
-
+            folder: WEAPON_PATH + "rocket/"
         },
 
         minigun: {
-
-            folder: "sprites/weapons/minigun/",
-
-            models: [
-                "15",
-                "22",
-                "23",
-                "24",
-                "30"
-            ]
-
+            folder: WEAPON_PATH + "minigun/"
         },
 
         weapon1: {
-
-            folder: "sprites/weapons/Weapon_1/",
-
-            models: []
-
+            folder: WEAPON_PATH + "Weapon_1/"
         },
 
         weapon2: {
-
-            folder: "sprites/weapons/Weapon_2/",
-
-            models: []
-
+            folder: WEAPON_PATH + "Weapon_2/"
         },
 
         weapon3: {
-
-            folder: "sprites/weapons/Weapon_3/",
-
-            models: []
-
+            folder: WEAPON_PATH + "Weapon_3/"
         }
 
     },
 
-    // =====================================
+    // =====================================================
     // BULLETS
-    // =====================================
+    // =====================================================
+
+    /*
+        No projeto atual encontrei:
+
+        public/sprites/bullets/bullet.png
+
+        e também a pasta:
+        public/sprites/bullets/Laser Sprites/
+
+        Portanto não vamos tentar carregar bullet_1.png,
+        bullet_2.png etc. porque esses arquivos não existem
+        nesse caminho atualmente.
+    */
 
     bullets: {
 
-        bullet_1: "sprites/bullets/1.png",
-        bullet_2: "sprites/bullets/2.png",
-        bullet_3: "sprites/bullets/3.png",
-        bullet_4_1: "sprites/bullets/4_1.png",
-        bullet_4_2: "sprites/bullets/4_2.png",
-        bullet_5_1: "sprites/bullets/5_1.png",
-        bullet_5_2: "sprites/bullets/5_2.png",
-        bullet_6: "sprites/bullets/6.png",
-        bullet_7_1: "sprites/bullets/7_1.png",
-        bullet_7_2: "sprites/bullets/7_2.png",
-        bullet_8: "sprites/bullets/8.png",
-        bullet_9: "sprites/bullets/9.png",
-        bullet_10: "sprites/bullets/10.png"
+        bullet_default: "sprites/bullets/bullet.png"
 
     },
 
-    // =====================================
-    // SHOOT EFFECTS
-    // =====================================
+    // =====================================================
+    // EFFECTS
+    // =====================================================
+
+    /*
+        Vamos preencher quando organizarmos os efeitos
+        de disparo definitivamente.
+    */
 
     effects: {
 
-        effect_1_1: "sprites/shoot_effects/1_1.png",
-        effect_1_2: "sprites/shoot_effects/1_2.png",
-
-        effect_2_1: "sprites/shoot_effects/2_1.png",
-        effect_2_2: "sprites/shoot_effects/2_2.png",
-
-        effect_3_1: "sprites/shoot_effects/3_1.png",
-        effect_3_2: "sprites/shoot_effects/3_2.png",
-
-        effect_4_1: "sprites/shoot_effects/4_1.png",
-        effect_4_2: "sprites/shoot_effects/4_2.png",
-
-        effect_5_1: "sprites/shoot_effects/5_1.png",
-        effect_5_2: "sprites/shoot_effects/5_2.png"
-
     },
 
-    // =====================================
+    // =====================================================
     // MAPS
-    // =====================================
+    // =====================================================
+
+    /*
+        O ZIP atualmente possui level1.tmj e neon_titles.png,
+        porém ambos estão vazios.
+
+        Por isso não vamos carregá-los ainda.
+        Quando criarmos o primeiro mapa real,
+        cadastraremos aqui.
+    */
 
     maps: {
 
-        level1: {
-
-            key: "level1",
-
-            json: "maps/level1/level1.tmj",
-
-            tilesetKey: "neon_tiles",
-
-            tileset: "maps/level1/neon_tiles.png"
-
-        }
-
     },
 
-    // =====================================
+    // =====================================================
     // UI
-    // =====================================
+    // =====================================================
 
     ui: {
 
@@ -255,17 +208,17 @@ const AssetManifest = {
 
     },
 
-    // =====================================
+    // =====================================================
     // AUDIO
-    // =====================================
+    // =====================================================
 
     audio: {
 
     },
 
-    // =====================================
+    // =====================================================
     // ENEMIES
-    // =====================================
+    // =====================================================
 
     enemies: {
 

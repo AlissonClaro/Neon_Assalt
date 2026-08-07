@@ -1,16 +1,14 @@
-export default class Socket {
+import Socket from "./Socket.js";
 
-    constructor(x = 0, y = 0) {
+export default class HeadSocket
+    extends Socket {
 
-        this.x = x;
-        this.y = y;
+    constructor() {
 
-    }
-
-    set(x, y) {
-
-        this.x = x;
-        this.y = y;
+        super(
+            0,
+            -38
+        );
 
     }
 
